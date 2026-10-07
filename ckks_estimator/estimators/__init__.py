@@ -1,6 +1,5 @@
 """Estimator adapters."""
 
-from .malb import MalbEstimator
-from .tabog import TabOgEstimator
+from .sage import MalbEstimator, TabOgEstimator
 
 __all__ = ["MalbEstimator", "TabOgEstimator"]

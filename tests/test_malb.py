@@ -11,7 +11,7 @@ from ckks_estimator import (
     DiscreteGaussian, EstimationError, Parameters, SparseTernary, Ternary,
     Uniform, UnsupportedParameters,
 )
-from ckks_estimator.estimators import MalbEstimator
+from ckks_estimator.estimators._malb import MalbEstimator
 from ckks_estimator.estimators._source import source_revision
 
 

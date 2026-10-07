@@ -1,8 +1,6 @@
 """Conservative evaluation with persistent, versioned caching."""
 
 from contextlib import contextmanager
-from dataclasses import fields
-from decimal import Decimal
 import json
 import os
 from pathlib import Path
@@ -10,34 +8,13 @@ import sqlite3
 from typing import Iterable, Union
 
 from .backend import EstimationError, Estimator, UnsupportedParameters
-from .parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary, Uniform
+from .parameters import Parameters
 from .results import AttackEstimate, Estimate, Evaluation
-
-
-def _encode(value):
-    if isinstance(value, (Parameters, SparseTernary, Ternary, Uniform, DiscreteGaussian)):
-        return [type(value).__name__, [[f.name, _encode(getattr(value, f.name))]
-                                      for f in fields(value)]]
-    if isinstance(value, dict):
-        if not all(isinstance(key, str) for key in value):
-            raise TypeError("Configuration keys must be strings.")
-        return ["dict", [[key, _encode(value[key])] for key in sorted(value)]]
-    if isinstance(value, (tuple, list)):
-        return [type(value).__name__, [_encode(item) for item in value]]
-    if isinstance(value, Decimal):
-        if not value.is_finite():
-            raise ValueError("Configuration decimals must be finite.")
-        return ["decimal", str(value)]
-    if type(value) is int:
-        return ["int", hex(value)]
-    if value is None or type(value) in (str, bool, float):
-        return [type(value).__name__, value]
-    raise TypeError(f"Unsupported configuration value: {type(value).__name__}.")
+from ._serialization import dumps
 
 
 def _key(parameters, name, revision, cost_model, configuration):
-    return json.dumps(_encode((parameters, name, revision, cost_model, dict(configuration))),
-                      allow_nan=False, separators=(",", ":"))
+    return dumps((parameters, name, revision, cost_model, dict(configuration)))
 
 
 @contextmanager

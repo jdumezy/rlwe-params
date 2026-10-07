@@ -12,7 +12,7 @@ from ckks_estimator import (
     DiscreteGaussian, EstimationError, Parameters, SparseTernary, Ternary,
     UnsupportedParameters,
 )
-from ckks_estimator.estimators import TabOgEstimator
+from ckks_estimator.estimators._tabog import TabOgEstimator
 
 
 TABOG_PATH = os.environ.get("TABOG_ESTIMATOR_PATH")

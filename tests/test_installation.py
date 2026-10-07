@@ -90,7 +90,7 @@ class InstallationTests(unittest.TestCase):
                 install_backend("malb")
             self.assertEqual(list(self.destination.iterdir()), [])
         for adapter in (MalbEstimator, TabOgEstimator):
-            with self.assertRaisesRegex(ValueError, "ckks-estimator-install"):
+            with self.assertRaisesRegex(ValueError, "ckks-estimator setup"):
                 adapter()
         self.assertEqual(list(self.destination.iterdir()), [])
 

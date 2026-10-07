@@ -12,9 +12,9 @@ COPY --chown=sage:sage pyproject.toml ./
 COPY --chown=sage:sage ckks_estimator ./ckks_estimator
 ENV CKKS_ESTIMATOR_BACKENDS=/home/sage/backends
 RUN sage -python -m pip install --no-deps --no-build-isolation . \
-    && sage -python -m ckks_estimator.installation malb tabog \
+    && sage -python -m ckks_estimator setup \
     && sage -python -c "from ckks_estimator.estimators import MalbEstimator, TabOgEstimator; MalbEstimator(); TabOgEstimator()"
 
 WORKDIR /work
-ENTRYPOINT ["sage", "-python"]
-CMD ["-i"]
+ENTRYPOINT ["sage", "-python", "-m", "ckks_estimator"]
+CMD ["--help"]

@@ -11,7 +11,7 @@ from ..backend import EstimationError, UnsupportedParameters
 from ..installation import backend_path
 from ..parameters import Parameters, SparseTernary
 from ..results import AttackEstimate, Estimate
-from .malb import MalbEstimator
+from ._malb import MalbEstimator
 from ._source import source_revision
 
 
