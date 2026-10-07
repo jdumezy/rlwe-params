@@ -1,6 +1,6 @@
 """The interface implemented by full and partial estimators."""
 
-from typing import Protocol
+from typing import Mapping, Protocol
 
 from .parameters import Parameters
 from .results import Estimate
@@ -20,6 +20,7 @@ class Estimator(Protocol):
     name: str
     revision: str
     cost_model: str
+    configuration: Mapping[str, object]
 
     def supports(self, parameters: Parameters) -> bool:
         """Check applicability without running estimation."""

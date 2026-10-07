@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Union
+from typing import Optional, Union
 
 
 def _integer(name: str, value: int, minimum: int) -> None:
@@ -69,10 +69,13 @@ class Parameters:
     q: int
     secret: Distribution
     error: Distribution
+    samples: Optional[int] = None  # None permits unlimited LWE samples.
 
     def __post_init__(self) -> None:
         _integer("n", self.n, 1)
         _integer("q", self.q, 2)
+        if self.samples is not None:
+            _integer("samples", self.samples, 1)
         for name in ("secret", "error"):
             distribution = getattr(self, name)
             if not isinstance(distribution, (SparseTernary, Ternary, Uniform, DiscreteGaussian)):

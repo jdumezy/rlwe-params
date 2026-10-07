@@ -1,23 +1,23 @@
 """Normalized attack costs and their provenance."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Tuple
+from typing import Mapping, Tuple
 
 from .parameters import Parameters
 
 
 @dataclass(frozen=True)
 class AttackEstimate:
-    """Base-2 logarithm of attack cost in the enclosing estimate's cost model."""
+    """Log2 attack cost. Positive infinity denotes no finite modeled cost."""
 
     attack: str
     security_bits: Decimal
 
     def __post_init__(self) -> None:
         value = Decimal(str(self.security_bits))
-        if not self.attack or not value.is_finite() or value < 0:
-            raise ValueError("An attack needs a name and a finite, nonnegative cost.")
+        if not self.attack or value.is_nan() or value < 0:
+            raise ValueError("An attack needs a name and a nonnegative cost.")
         object.__setattr__(self, "security_bits", value)
 
 
@@ -35,6 +35,7 @@ class Estimate:
     revision: str
     cost_model: str
     attacks: Tuple[AttackEstimate, ...]
+    configuration: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not all(isinstance(value, str) and value.strip()
@@ -45,4 +46,7 @@ class Estimate:
             raise ValueError("An estimate needs at least one completed attack.")
         if len({attack.attack for attack in attacks}) != len(attacks):
             raise ValueError("Attack names must be unique within an estimate.")
+        if not any(attack.security_bits.is_finite() for attack in attacks):
+            raise ValueError("No attack produced a finite cost.")
         object.__setattr__(self, "attacks", attacks)
+        object.__setattr__(self, "configuration", dict(self.configuration))

@@ -13,6 +13,7 @@ class SingleAttackEstimator:
     name = "synthetic"
     revision = "git:0123456789abcdef0123456789abcdef01234567"
     cost_model = "classical-test-operations"
+    configuration = {}
 
     def supports(self, parameters):
         return isinstance(parameters.secret, SparseTernary)
@@ -70,9 +71,12 @@ class InterfaceTests(unittest.TestCase):
         for attacks in ((), (attack, attack)):
             with self.subTest(attacks=attacks), self.assertRaises(ValueError):
                 Estimate(self.parameters(), "test", SingleAttackEstimator.revision, "model", attacks)
-        for bits in ("NaN", "Infinity", "-Infinity", "-1"):
+        for bits in ("NaN", "-Infinity", "-1"):
             with self.subTest(bits=bits), self.assertRaises(ValueError):
                 AttackEstimate("attack", bits)
+        with self.assertRaises(ValueError):
+            Estimate(self.parameters(), "test", SingleAttackEstimator.revision, "model",
+                     (AttackEstimate("attack", "Infinity"),))
         for revision in (None, "", " "):
             with self.subTest(revision=revision), self.assertRaises(ValueError):
                 Estimate(self.parameters(), "test", revision, "model", (attack,))
