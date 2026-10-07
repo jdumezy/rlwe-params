@@ -50,3 +50,26 @@ class Estimate:
             raise ValueError("No attack produced a finite cost.")
         object.__setattr__(self, "attacks", attacks)
         object.__setattr__(self, "configuration", dict(self.configuration))
+
+
+@dataclass(frozen=True)
+class Evaluation:
+    """Comparable backend results and names of inapplicable backends."""
+
+    estimates: Tuple[Estimate, ...]
+    unsupported: Tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        estimates = tuple(self.estimates)
+        if not estimates:
+            raise ValueError("An evaluation needs at least one estimate.")
+        if any(e.parameters != estimates[0].parameters or
+               e.cost_model != estimates[0].cost_model for e in estimates):
+            raise ValueError("Estimates must share parameters and a cost model.")
+        object.__setattr__(self, "estimates", estimates)
+        object.__setattr__(self, "unsupported", tuple(self.unsupported))
+
+    @property
+    def security_bits(self) -> Decimal:
+        return min(attack.security_bits for estimate in self.estimates
+                   for attack in estimate.attacks)

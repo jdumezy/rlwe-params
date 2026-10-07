@@ -15,7 +15,11 @@ class EstimationError(RuntimeError):
 
 
 class Estimator(Protocol):
-    """Interface for a configured estimator."""
+    """Interface for a configured estimator.
+
+    Configuration uses string-keyed dictionaries, lists, tuples, JSON scalars,
+    and finite Decimals. cost_model must identify comparable work units.
+    """
 
     name: str
     revision: str
