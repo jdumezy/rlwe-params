@@ -8,5 +8,8 @@ version = "0.1.0"
 description = "Backend-independent security estimation for CKKS parameters."
 requires-python = ">=3.9"
 
+[project.scripts]
+ckks-estimator-install = "ckks_estimator.installation:main"
+
 [tool.setuptools.packages.find]
 include = ["ckks_estimator*"]

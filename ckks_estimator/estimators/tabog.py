@@ -8,6 +8,7 @@ import sys
 from types import ModuleType
 
 from ..backend import EstimationError, UnsupportedParameters
+from ..installation import backend_path
 from ..parameters import Parameters, SparseTernary
 from ..results import AttackEstimate, Estimate
 from .malb import MalbEstimator
@@ -56,14 +57,15 @@ class TabOgEstimator:
 
     name = "TabOg/mlwe-hybrids"
 
-    def __init__(self, path, *, attacks=None, cost_model="MATZOV", shape_model="GSA"):
+    def __init__(self, path=None, *, attacks=None, cost_model="MATZOV", shape_model="GSA"):
         selected = tuple(ATTACKS) if attacks is None else tuple(attacks)
         if not selected or len(set(selected)) != len(selected) or set(selected) - ATTACKS.keys():
             raise ValueError(f"Select distinct attacks from {tuple(ATTACKS)}.")
-        primal = Path(path).resolve() / "PrimalHybrid"
+        primal = (backend_path("tabog") if path is None else Path(path).resolve()) / "PrimalHybrid"
         source = primal / "lwe_rot_primal.py"
         if not source.is_file():
-            raise ValueError("path must point to a TabOg/mlwe-hybrids checkout.")
+            raise ValueError("Install TabOg with ckks-estimator-install tabog, "
+                             "or pass a mlwe-hybrids checkout path.")
         self._malb = MalbEstimator(primal / "lattice_estimator", cost_model=cost_model,
                                   shape_model=shape_model)
         revision = source_revision({"tabog": source}, {})

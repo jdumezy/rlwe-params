@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 
 from ..backend import EstimationError, UnsupportedParameters
+from ..installation import backend_path
 from ..parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary, Uniform
 from ..results import AttackEstimate, Estimate
 from ._source import source_revision
@@ -17,18 +18,19 @@ ATTACKS = ("arora-gb", "bkw", "usvp", "bdd", "bdd_hybrid", "bdd_mitm_hybrid",
 
 
 class MalbEstimator:
-    """Use a lattice-estimator checkout. Sage is imported at construction."""
+    """Use installed or explicit lattice-estimator sources. Requires Sage."""
 
     name = "malb/lattice-estimator"
 
-    def __init__(self, path, *, attacks=None, cost_model="MATZOV", shape_model="GSA"):
+    def __init__(self, path=None, *, attacks=None, cost_model="MATZOV", shape_model="GSA"):
         if attacks is not None:
             attacks = tuple(attacks)
             if not attacks or len(set(attacks)) != len(attacks) or set(attacks) - set(ATTACKS):
                 raise ValueError(f"Select distinct attacks from {ATTACKS}.")
-        source = Path(path).resolve() / "estimator"
+        source = (backend_path("malb") if path is None else Path(path).resolve()) / "estimator"
         if not (source / "__init__.py").is_file():
-            raise ValueError("path must point to a malb/lattice-estimator checkout.")
+            raise ValueError("Install malb with ckks-estimator-install malb, "
+                             "or pass a lattice-estimator checkout path.")
 
         from sage.all import RR, oo
         from sage.version import version as sage_version
