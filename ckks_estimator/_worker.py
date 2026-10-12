@@ -2,6 +2,7 @@
 
 from contextlib import redirect_stdout
 from hashlib import sha256
+import importlib
 from pathlib import Path
 import sys
 import traceback
@@ -9,6 +10,7 @@ import traceback
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from ckks_estimator.installation import BACKENDS
 from ckks_estimator._serialization import dumps, loads
 
 
@@ -20,11 +22,8 @@ def main():
             request = loads(line)
             with redirect_stdout(sys.stderr):
                 if request["operation"] == "load":
-                    from ckks_estimator.estimators._malb import MalbEstimator
-                    from ckks_estimator.estimators._tabog import TabOgEstimator
-
-                    adapter = {"malb": MalbEstimator, "tabog": TabOgEstimator}[request["backend"]]
-                    backend = adapter(**request["options"])
+                    module, _, adapter = BACKENDS[request["backend"]].adapter.partition(":")
+                    backend = getattr(importlib.import_module(module), adapter)(**request["options"])
                     result = {key: getattr(backend, key) for key in
                               ("name", "revision", "cost_model", "configuration")}
                     identifier = sha256(dumps(result).encode()).hexdigest()

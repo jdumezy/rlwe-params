@@ -1,22 +1,51 @@
-"""Install pinned backend sources. Requires Git, but not Sage."""
+"""Backend registry and pinned source installation. Requires Git, but not Sage."""
 
 import argparse
 import os
 from pathlib import Path
 import subprocess
 import tempfile
+from typing import Callable, NamedTuple, Optional, Tuple
+
+from .parameters import Parameters, SparseTernary
 
 
+class Backend(NamedTuple):
+    """Pinned sources and the adapter that evaluates them in the Sage worker.
+
+    source is a file whose presence identifies a checkout. adapter is a
+    "module:class" reference imported only inside the worker. applies selects
+    the backend by default, without Sage. None selects it for all parameters.
+    """
+
+    url: str
+    revision: str
+    submodules: Tuple[str, ...] = ()
+    source: str = ""
+    adapter: str = ""
+    applies: Optional[Callable[[Parameters], bool]] = None
+
+
+def _sparse_power_of_two(parameters):
+    return (isinstance(parameters.secret, SparseTernary) and parameters.secret.h > 0
+            and parameters.n >= 2 and parameters.n & (parameters.n - 1) == 0)
+
+
+# Adding a backend takes an entry here and its adapter module.
 BACKENDS = {
-    "malb": (
+    "malb": Backend(
         "https://github.com/malb/lattice-estimator.git",
         "6019056011d10d7e9c30a0d5da2d2f729fbc2eec",
-        (),
+        source="estimator/__init__.py",
+        adapter="ckks_estimator.estimators._malb:MalbEstimator",
     ),
-    "tabog": (
+    "tabog": Backend(
         "https://github.com/TabOg/mlwe-hybrids.git",
         "a92f335665eef69927d2d8f49832bd595a6dac32",
         ("PrimalHybrid/lattice_estimator",),
+        source="PrimalHybrid/lwe_rot_primal.py",
+        adapter="ckks_estimator.estimators._tabog:TabOgEstimator",
+        applies=_sparse_power_of_two,
     ),
 }
 
@@ -28,7 +57,7 @@ def backend_path(name: str, directory=None) -> Path:
     if directory is None:
         root = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
         directory = os.environ.get("CKKS_ESTIMATOR_BACKENDS", root / "ckks-estimator" / "backends")
-    return Path(directory).expanduser().resolve() / f"{name}-{BACKENDS[name][1]}"
+    return Path(directory).expanduser().resolve() / f"{name}-{BACKENDS[name].revision}"
 
 
 def _git(path, *arguments):
@@ -54,7 +83,7 @@ def _verify(path, revision, submodules):
 def install_backend(name: str, *, directory=None) -> Path:
     """Install a pinned checkout, or reuse a matching clean installation."""
     destination = backend_path(name, directory)
-    url, revision, submodules = BACKENDS[name]
+    url, revision, submodules = BACKENDS[name][:3]
     if destination.exists():
         _verify(destination, revision, submodules)
         return destination

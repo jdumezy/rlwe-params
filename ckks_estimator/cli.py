@@ -7,6 +7,7 @@ import sqlite3
 import subprocess
 
 from .api import estimate
+from .installation import BACKENDS
 from .parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary, Uniform
 
 
@@ -25,7 +26,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="ckks-estimator")
     commands = parser.add_subparsers(dest="command", required=True)
     setup_parser = commands.add_parser("setup", help="Prepare backend sources and runtime.")
-    setup_parser.add_argument("backends", nargs="*", metavar="BACKEND", default=["malb", "tabog"])
+    setup_parser.add_argument("backends", nargs="*", metavar="BACKEND", default=list(BACKENDS))
     setup_parser.add_argument("--sage", help="Use this Sage executable instead of a managed runtime.")
 
     query = commands.add_parser("estimate", help="Estimate security for CKKS parameters.")
@@ -42,7 +43,7 @@ def main(argv=None):
     secret.add_argument("--gaussian", metavar="STDDEV")
     query.add_argument("--sigma", required=True, help="Error standard deviation.")
     query.add_argument("--samples", type=_positive, help="Available samples. Default: unlimited.")
-    query.add_argument("--backend", choices=("malb", "tabog"), action="append",
+    query.add_argument("--backend", choices=tuple(BACKENDS), action="append",
                        help="Restrict backends. Default: all applicable backends.")
     caching = query.add_mutually_exclusive_group()
     caching.add_argument("--no-cache", action="store_true")
@@ -73,10 +74,9 @@ def main(argv=None):
         )
         estimators = None
         if arguments.backend:
-            from .estimators import MalbEstimator, TabOgEstimator
+            from .estimators import SageEstimator
 
-            adapters = {"malb": MalbEstimator, "tabog": TabOgEstimator}
-            estimators = [adapters[name]() for name in dict.fromkeys(arguments.backend)]
+            estimators = [SageEstimator(name) for name in dict.fromkeys(arguments.backend)]
         result = estimate(parameters, estimators=estimators,
                           cache=False if arguments.no_cache else arguments.cache or True)
         if arguments.json:

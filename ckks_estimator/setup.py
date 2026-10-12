@@ -48,7 +48,7 @@ def _managed_runtime(root):
     return (*manager, "run", "--prefix", prefix, "sage")
 
 
-def setup(backends=("malb", "tabog"), *, sage=None):
+def setup(backends=tuple(BACKENDS), *, sage=None):
     """Use an existing Sage or install a private one, then install backend sources."""
     backends = tuple(backends)
     if not backends or set(backends) - BACKENDS.keys():

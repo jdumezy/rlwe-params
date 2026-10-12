@@ -50,18 +50,22 @@ class ApiTests(unittest.TestCase):
             estimate(self.parameters, n=512, estimators=[Backend()])
 
     def test_default_selection_includes_sparse_attacks_and_does_not_hide_missing_backend(self):
-        with patch("ckks_estimator.estimators.MalbEstimator", return_value=Backend()) as malb:
-            with patch("ckks_estimator.estimators.TabOgEstimator", return_value=Backend()) as tabog:
-                result = estimate(self.parameters, cache=False)
-                self.assertEqual(len(result.estimates), 2)
-                malb.assert_called_once()
-                tabog.assert_called_once()
-            with patch("ckks_estimator.estimators.TabOgEstimator", side_effect=ValueError("missing")):
-                with self.assertRaisesRegex(ValueError, "missing"):
-                    estimate(self.parameters, cache=False)
-                result = estimate(n=256, q=2**15, secret=Ternary(),
-                                  error=DiscreteGaussian("3.2"), cache=False)
-                self.assertEqual(len(result.estimates), 1)
+        with patch("ckks_estimator.estimators.SageEstimator", return_value=Backend()) as adapter:
+            result = estimate(self.parameters, cache=False)
+            self.assertEqual(len(result.estimates), 2)
+            self.assertEqual([call.args for call in adapter.call_args_list], [("malb",), ("tabog",)])
+
+        def missing(name):
+            if name == "tabog":
+                raise ValueError("missing")
+            return Backend()
+
+        with patch("ckks_estimator.estimators.SageEstimator", side_effect=missing):
+            with self.assertRaisesRegex(ValueError, "missing"):
+                estimate(self.parameters, cache=False)
+            result = estimate(n=256, q=2**15, secret=Ternary(),
+                              error=DiscreteGaussian("3.2"), cache=False)
+            self.assertEqual(len(result.estimates), 1)
 
     def test_wire_preserves_large_moduli_decimal_thresholds_and_configuration_types(self):
         parameters = Parameters(4096, 1 << 20000, SparseTernary(15, 17),

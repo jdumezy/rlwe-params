@@ -2,16 +2,20 @@
 
 from pathlib import Path
 
-from ..installation import backend_path
+from ..installation import BACKENDS, backend_path
 from .._runtime import worker
 
 
-class _SageEstimator:
-    def __init__(self, path=None, *, attacks=None, cost_model="MATZOV", shape_model="GSA", sage=None):
-        path = backend_path(self.backend) if path is None else Path(path).resolve()
-        if not (path / self.source).is_file():
-            raise ValueError(f"Missing {self.backend} sources. Run 'ckks-estimator setup {self.backend}' "
+class SageEstimator:
+    """A registered backend through an isolated Sage runtime."""
+
+    def __init__(self, backend, path=None, *, attacks=None, cost_model="MATZOV",
+                 shape_model="GSA", sage=None):
+        path = backend_path(backend) if path is None else Path(path).resolve()
+        if not (path / BACKENDS[backend].source).is_file():
+            raise ValueError(f"Missing {backend} sources. Run 'ckks-estimator setup {backend}' "
                              "or pass a checkout path.")
+        self.backend = backend
         self._worker = worker(sage)
         self._options = {
             "path": str(path), "attacks": None if attacks is None else tuple(attacks),
@@ -37,15 +41,15 @@ class _SageEstimator:
         return self._request("estimate", parameters)
 
 
-class MalbEstimator(_SageEstimator):
+class MalbEstimator(SageEstimator):
     """malb/lattice-estimator through an isolated Sage runtime."""
 
-    backend = "malb"
-    source = "estimator/__init__.py"
+    def __init__(self, path=None, **options):
+        super().__init__("malb", path, **options)
 
 
-class TabOgEstimator(_SageEstimator):
+class TabOgEstimator(SageEstimator):
     """TabOg's sparse attacks through an isolated Sage runtime."""
 
-    backend = "tabog"
-    source = "PrimalHybrid/lwe_rot_primal.py"
+    def __init__(self, path=None, **options):
+        super().__init__("tabog", path, **options)

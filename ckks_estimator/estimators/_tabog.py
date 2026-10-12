@@ -64,7 +64,7 @@ class TabOgEstimator:
         primal = (backend_path("tabog") if path is None else Path(path).resolve()) / "PrimalHybrid"
         source = primal / "lwe_rot_primal.py"
         if not source.is_file():
-            raise ValueError("Install TabOg with ckks-estimator-install tabog, "
+            raise ValueError("Run 'ckks-estimator setup tabog', "
                              "or pass a mlwe-hybrids checkout path.")
         self._malb = MalbEstimator(primal / "lattice_estimator", cost_model=cost_model,
                                   shape_model=shape_model)

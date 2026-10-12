@@ -29,7 +29,7 @@ class MalbEstimator:
                 raise ValueError(f"Select distinct attacks from {ATTACKS}.")
         source = (backend_path("malb") if path is None else Path(path).resolve()) / "estimator"
         if not (source / "__init__.py").is_file():
-            raise ValueError("Install malb with ckks-estimator-install malb, "
+            raise ValueError("Run 'ckks-estimator setup malb', "
                              "or pass a lattice-estimator checkout path.")
 
         from sage.all import RR, oo
