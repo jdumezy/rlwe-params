@@ -10,7 +10,7 @@ from types import ModuleType
 from ..backend import EstimationError, UnsupportedParameters
 from ..installation import backend_path
 from ..parameters import Parameters, SparseTernary
-from ..results import AttackEstimate, Estimate
+from ..results import AttackEstimate
 from ._malb import MalbEstimator
 from ._source import source_revision
 
@@ -68,15 +68,15 @@ class TabOgEstimator:
                              "or pass a mlwe-hybrids checkout path.")
         self._malb = MalbEstimator(primal / "lattice_estimator", cost_model=cost_model,
                                   shape_model=shape_model)
-        revision = source_revision({"tabog": source}, {})
+        revision = source_revision({"tabog": source, "adapter": Path(__file__)}, {})
         self.revision = f"tabog={revision}|malb={self._malb.revision}"
         self._rotated = _load_rotated(source, self._malb._module, self.revision)
         self.cost_model = cost_model
-        self._attacks = tuple(name for name in ATTACKS if name in selected)
+        self.attacks = tuple(name for name in ATTACKS if name in selected)
 
     @property
     def configuration(self):
-        return {**self._malb.configuration, "attacks": self._attacks}
+        return self._malb.configuration
 
     def supports(self, parameters: Parameters) -> bool:
         if not self._malb.supports(parameters):
@@ -88,25 +88,20 @@ class TabOgEstimator:
         native = self._malb._parameters(parameters).normalize()
         return isinstance(native.Xs, self._malb._module.ND.SparseTernary)
 
-    def estimate(self, parameters: Parameters) -> Estimate:
+    def attack(self, parameters: Parameters, name: str) -> AttackEstimate:
         if not self.supports(parameters):
             raise UnsupportedParameters(
                 "TabOg requires a power-of-two ring and a nonzero sparse ternary secret "
                 "that remains sparse ternary after LWE normalization."
             )
-        attacks = []
-        for name in self._attacks:
-            try:
-                cost = self._rotated.rot_primal_hybrid(
-                    self._malb._parameters(parameters), poly_degree=parameters.n,
-                    red_cost_model=self._malb._reduction, red_shape_model=self._malb._shape,
-                    **ATTACKS[name],
-                )
-                attacks.append(AttackEstimate(name, self._malb._bits(cost["rop"])))
-            except Exception as exc:
-                raise EstimationError(f"TabOg attack {name} failed: {exc}") from exc
+        if name not in self.attacks:
+            raise ValueError(f"Attack {name!r} is not selected.")
         try:
-            return Estimate(parameters, self.name, self.revision, self.cost_model,
-                            tuple(attacks), self.configuration)
-        except ValueError as exc:
-            raise EstimationError(f"Invalid TabOg result: {exc}") from exc
+            cost = self._rotated.rot_primal_hybrid(
+                self._malb._parameters(parameters), poly_degree=parameters.n,
+                red_cost_model=self._malb._reduction, red_shape_model=self._malb._shape,
+                **ATTACKS[name],
+            )
+            return AttackEstimate(name, self._malb._bits(cost["rop"]))
+        except Exception as exc:
+            raise EstimationError(f"TabOg attack {name} failed: {exc}") from exc

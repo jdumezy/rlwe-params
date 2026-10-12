@@ -45,6 +45,7 @@ def main(argv=None):
     query.add_argument("--samples", type=_positive, help="Available samples. Default: unlimited.")
     query.add_argument("--backend", choices=tuple(BACKENDS), action="append",
                        help="Restrict backends. Default: all applicable backends.")
+    query.add_argument("--jobs", type=_positive, help="Attacks run in parallel. Default: at most 4.")
     caching = query.add_mutually_exclusive_group()
     caching.add_argument("--no-cache", action="store_true")
     caching.add_argument("--cache", type=Path, help="Use this cache database.")
@@ -78,10 +79,12 @@ def main(argv=None):
 
             estimators = [SageEstimator(name) for name in dict.fromkeys(arguments.backend)]
         result = estimate(parameters, estimators=estimators,
-                          cache=False if arguments.no_cache else arguments.cache or True)
+                          cache=False if arguments.no_cache else arguments.cache or True,
+                          jobs=arguments.jobs)
         if arguments.json:
             print(json.dumps({
                 "security_bits": str(result.security_bits), "unsupported": result.unsupported,
+                "complete": result.complete,
                 "estimates": [{"estimator": e.estimator, "revision": e.revision,
                                "cost_model": e.cost_model, "configuration": e.configuration,
                                "attacks": {a.attack: str(a.security_bits) for a in e.attacks}}

@@ -25,13 +25,14 @@ def main():
                     module, _, adapter = BACKENDS[request["backend"]].adapter.partition(":")
                     backend = getattr(importlib.import_module(module), adapter)(**request["options"])
                     result = {key: getattr(backend, key) for key in
-                              ("name", "revision", "cost_model", "configuration")}
+                              ("name", "revision", "cost_model", "configuration", "attacks")}
                     identifier = sha256(dumps(result).encode()).hexdigest()
                     backends[identifier] = backend
                     result["id"] = identifier
-                elif request["operation"] in ("supports", "estimate"):
-                    backend = backends[request["id"]]
-                    result = getattr(backend, request["operation"])(request["parameters"])
+                elif request["operation"] == "supports":
+                    result = backends[request["id"]].supports(request["parameters"])
+                elif request["operation"] == "attack":
+                    result = backends[request["id"]].attack(request["parameters"], request["attack"])
                 else:
                     raise ValueError("Unknown worker operation.")
             response = {"result": result}

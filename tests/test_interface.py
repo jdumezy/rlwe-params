@@ -14,15 +14,15 @@ class SingleAttackEstimator:
     revision = "git:0123456789abcdef0123456789abcdef01234567"
     cost_model = "classical-test-operations"
     configuration = {}
+    attacks = ("one-attack",)
 
     def supports(self, parameters):
         return isinstance(parameters.secret, SparseTernary)
 
-    def estimate(self, parameters):
+    def attack(self, parameters, name):
         if not self.supports(parameters):
             raise UnsupportedParameters("Only sparse ternary secrets are supported.")
-        return Estimate(parameters, self.name, self.revision, self.cost_model,
-                        (AttackEstimate("one-attack", "127.7"),))
+        return AttackEstimate(name, "127.7")
 
 
 class InterfaceTests(unittest.TestCase):
@@ -50,14 +50,11 @@ class InterfaceTests(unittest.TestCase):
         backend: Estimator = SingleAttackEstimator()
         parameters = self.parameters()
         self.assertTrue(backend.supports(parameters))
-        result = backend.estimate(parameters)
-        self.assertEqual(result.parameters, parameters)
-        self.assertEqual(result.revision, backend.revision)
-        self.assertEqual(len(result.attacks), 1)
-        self.assertEqual(result.attacks[0].security_bits, Decimal("127.7"))
+        result = backend.attack(parameters, backend.attacks[0])
+        self.assertEqual((result.attack, result.security_bits), ("one-attack", Decimal("127.7")))
         self.assertFalse(backend.supports(self.parameters(Ternary())))
         with self.assertRaises(UnsupportedParameters):
-            backend.estimate(self.parameters(Ternary()))
+            backend.attack(self.parameters(Ternary()), "one-attack")
 
     def test_threshold_precision_is_preserved(self):
         value = "127.999999999999999999999999999999999999"
@@ -74,9 +71,9 @@ class InterfaceTests(unittest.TestCase):
         for bits in ("NaN", "-Infinity", "-1"):
             with self.subTest(bits=bits), self.assertRaises(ValueError):
                 AttackEstimate("attack", bits)
-        with self.assertRaises(ValueError):
-            Estimate(self.parameters(), "test", SingleAttackEstimator.revision, "model",
-                     (AttackEstimate("attack", "Infinity"),))
+        unbounded = Estimate(self.parameters(), "test", SingleAttackEstimator.revision, "model",
+                             (AttackEstimate("attack", "Infinity"),))
+        self.assertEqual(unbounded.attacks[0].security_bits, Decimal("Infinity"))
         for revision in (None, "", " "):
             with self.subTest(revision=revision), self.assertRaises(ValueError):
                 Estimate(self.parameters(), "test", revision, "model", (attack,))

@@ -23,7 +23,7 @@ class AttackEstimate:
 
 @dataclass(frozen=True)
 class Estimate:
-    """Completed costs for the listed attacks.
+    """Completed costs for the listed attacks. configuration excludes their selection.
 
     cost_model specifies the work metric and classical or quantum convention.
     revision is an immutable source reference, such as a commit or content hash.
@@ -46,18 +46,21 @@ class Estimate:
             raise ValueError("An estimate needs at least one completed attack.")
         if len({attack.attack for attack in attacks}) != len(attacks):
             raise ValueError("Attack names must be unique within an estimate.")
-        if not any(attack.security_bits.is_finite() for attack in attacks):
-            raise ValueError("No attack produced a finite cost.")
         object.__setattr__(self, "attacks", attacks)
         object.__setattr__(self, "configuration", dict(self.configuration))
 
 
 @dataclass(frozen=True)
 class Evaluation:
-    """Comparable backend results and names of inapplicable backends."""
+    """Comparable backend results and names of inapplicable backends.
+
+    complete is False when evaluation stopped at the first attack below a
+    target. security_bits is then only an upper bound on the minimum.
+    """
 
     estimates: Tuple[Estimate, ...]
     unsupported: Tuple[str, ...] = ()
+    complete: bool = True
 
     def __post_init__(self) -> None:
         estimates = tuple(self.estimates)

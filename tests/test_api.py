@@ -11,10 +11,10 @@ import unittest
 from unittest.mock import patch
 
 from ckks_estimator import (
-    AttackEstimate, DiscreteGaussian, Estimate, EstimationError, Parameters,
+    AttackEstimate, DiscreteGaussian, EstimationError, Parameters,
     SparseTernary, Ternary, UnsupportedParameters, estimate,
 )
-from ckks_estimator._runtime import Worker, worker
+from ckks_estimator._runtime import Worker, pool
 from ckks_estimator._serialization import dumps, loads
 from ckks_estimator.cli import main
 from ckks_estimator.estimators import MalbEstimator, TabOgEstimator
@@ -24,16 +24,15 @@ class Backend:
     name = "synthetic"
     revision = "test-revision"
     cost_model = "test-cost-model"
-    configuration = {"attacks": ("finite", "infinite")}
+    configuration = {"shapes": ("test", 1)}
+    attacks = ("finite", "infinite")
 
     def supports(self, parameters):
         return True
 
-    def estimate(self, parameters):
-        return Estimate(parameters, self.name, self.revision, self.cost_model, (
-            AttackEstimate("finite", "127.999999999999999999999999999999999999"),
-            AttackEstimate("infinite", "Infinity"),
-        ), self.configuration)
+    def attack(self, parameters, name):
+        return AttackEstimate(name, {"finite": "127.999999999999999999999999999999999999",
+                                     "infinite": "Infinity"}[name])
 
 
 class ApiTests(unittest.TestCase):
@@ -70,9 +69,9 @@ class ApiTests(unittest.TestCase):
     def test_wire_preserves_large_moduli_decimal_thresholds_and_configuration_types(self):
         parameters = Parameters(4096, 1 << 20000, SparseTernary(15, 17),
                                 DiscreteGaussian("3.200000000000000000000000000000000001"), 8192)
-        result = Backend().estimate(parameters)
+        result = estimate(parameters, estimators=[Backend()], cache=False).estimates[0]
         self.assertEqual(loads(dumps(result)), result)
-        self.assertIsInstance(loads(dumps(result)).configuration["attacks"], tuple)
+        self.assertIsInstance(loads(dumps(result)).configuration["shapes"], tuple)
         self.assertEqual(loads(dumps(result)).attacks[1].security_bits, Decimal("Infinity"))
 
     def test_cli_translates_parameters_and_prints_precise_json(self):
@@ -114,19 +113,22 @@ class RuntimeIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             cache = Path(directory) / "estimates.sqlite3"
             result = estimate(parameters, cache=cache)
-            self.assertEqual(len(result.estimates), 2)
-            runtime = worker()
-            process = runtime.process
-            original = runtime.request
+            self.assertTrue(result.complete)
+            self.assertEqual([len(e.attacks) for e in result.estimates], [6, 4])
+            self.assertEqual(result, estimate(parameters, cache=False, jobs=1))
+            workers = list(pool().idle)
+            self.assertGreater(len(workers), 1)
+            processes = [runtime.process for runtime in workers]
+            original = Worker.request
 
-            def cached_only(operation, **arguments):
-                if operation == "estimate":
+            def cached_only(runtime, operation, **arguments):
+                if operation == "attack":
                     self.fail("A cached estimate reran an attack.")
-                return original(operation, **arguments)
+                return original(runtime, operation, **arguments)
 
-            with patch.object(runtime, "request", side_effect=cached_only):
+            with patch.object(Worker, "request", cached_only):
                 self.assertEqual(estimate(parameters, cache=cache), result)
-            self.assertIs(runtime.process, process)
+            self.assertEqual([runtime.process for runtime in workers], processes)
             command = [sys.executable, "-m", "ckks_estimator", "estimate", "--log-n", "8",
                        "--log-q", "15", "--sparse", "8", "8", "--sigma", "3.2",
                        "--cache", str(cache), "--json"]
@@ -138,17 +140,24 @@ class RuntimeIntegrationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 MalbEstimator(attacks=("does-not-exist",))
             with self.assertRaises(UnsupportedParameters):
-                TabOgEstimator().estimate(Parameters(256, 2**15, Ternary(), DiscreteGaussian("3.2")))
+                TabOgEstimator().attack(Parameters(256, 2**15, Ternary(), DiscreteGaussian("3.2")),
+                                        "primal-without-mitm")
             existing = MalbEstimator()
+            self.assertNotIn("arora-gb", existing.attacks)
+            self.assertNotIn("bkw", existing.attacks)
+            self.assertEqual(MalbEstimator(attacks=("bkw", "usvp")).attacks, ("bkw", "usvp"))
             self.assertTrue(existing.supports(parameters))
             self.assertNotIn("sage.all", sys.modules)
             print(f"Ordinary Python result: {result.security_bits} bits, "
                   f"{sum(len(e.attacks) for e in result.estimates)} attacks.")
-            runtime.close()
-            self.assertIsNotNone(process.poll())
+            refuted = estimate(parameters, cache=False, target=1000)
+            self.assertFalse(result.security_bits >= 1000 or refuted.complete)
+            self.assertEqual(estimate(parameters, cache=False), result)
+            for runtime in list(pool().idle):
+                runtime.close()
             self.assertTrue(existing.supports(parameters))
-            self.assertNotEqual(runtime.process.pid, process.pid)
-            runtime.close()
+            for runtime in list(pool().idle):
+                runtime.close()
 
 
 if __name__ == "__main__":

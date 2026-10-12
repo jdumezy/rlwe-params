@@ -11,7 +11,7 @@ from ckks_estimator import (
     DiscreteGaussian, EstimationError, Parameters, SparseTernary, Ternary,
     Uniform, UnsupportedParameters,
 )
-from ckks_estimator.estimators._malb import MalbEstimator
+from ckks_estimator.estimators._malb import ATTACKS, DEFAULT_ATTACKS, MalbEstimator
 from ckks_estimator.estimators._source import source_revision
 
 
@@ -41,7 +41,7 @@ MALB_PATH = os.environ.get("MALB_ESTIMATOR_PATH")
 class MalbTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.backend = MalbEstimator(MALB_PATH)
+        cls.backend = MalbEstimator(MALB_PATH, attacks=ATTACKS)
 
     def parameters(self, secret=None, samples=None):
         return Parameters(128, 3329, secret or Ternary(), DiscreteGaussian("3.2"), samples)
@@ -64,13 +64,13 @@ class MalbTests(unittest.TestCase):
         unsupported = Parameters(128, 3329, Ternary(), SparseTernary(7, 13))
         self.assertFalse(self.backend.supports(unsupported))
         with self.assertRaises(UnsupportedParameters):
-            self.backend.estimate(unsupported)
+            self.backend.attack(unsupported, "usvp")
 
     def test_matches_native_all_attack_estimate(self):
         from sage.all import RR
 
         parameters = self.parameters()
-        result = self.backend.estimate(parameters)
+        result = [self.backend.attack(parameters, name) for name in self.backend.attacks]
         module = self.backend._module
         direct = module.LWE.estimate(
             module.LWE.Parameters(n=128, q=3329, Xs=module.ND.Uniform(-1, 1),
@@ -78,15 +78,17 @@ class MalbTests(unittest.TestCase):
             red_cost_model=module.RC.MATZOV, red_shape_model=module.Simulator.GSA,
             catch_exceptions=False, quiet=True,
         )
-        self.assertEqual({attack.attack for attack in result.attacks}, set(direct))
-        for attack in result.attacks:
+        self.assertEqual({attack.attack for attack in result}, set(direct))
+        self.assertEqual(MalbEstimator(MALB_PATH).attacks, DEFAULT_ATTACKS)
+        self.assertEqual(set(ATTACKS) - set(DEFAULT_ATTACKS), {"arora-gb", "bkw"})
+        self.assertEqual(MalbEstimator(MALB_PATH).revision, self.backend.revision)
+        for attack in result:
             rop = direct[attack.attack]["rop"]
             if rop == self.backend._oo:
                 self.assertEqual(attack.security_bits, Decimal("Infinity"))
             else:
                 self.assertEqual(RR(str(attack.security_bits)), RR(rop).log2())
-        self.assertEqual(result.configuration, self.backend.configuration)
-        self.assertEqual(result.revision, self.backend.revision)
+        self.assertEqual(self.backend.configuration, {"shape_model": "GSA"})
 
     def test_cost_conversion_does_not_cross_threshold(self):
         from sage.all import RR
@@ -105,17 +107,14 @@ class MalbTests(unittest.TestCase):
         unused = Mock(side_effect=AssertionError("Unselected attack ran."))
         algorithms = {"usvp": finite, "bdd_mitm_hybrid": unbounded, "bdd": unused}
         with patch.object(backend, "_algorithms", return_value=algorithms):
-            result = backend.estimate(self.parameters())
-            self.assertEqual([cost.security_bits for cost in result.attacks],
-                             [Decimal(127), Decimal("Infinity")])
+            self.assertEqual([backend.attack(self.parameters(), name).security_bits
+                              for name in backend.attacks], [Decimal(127), Decimal("Infinity")])
+            with self.assertRaisesRegex(ValueError, "not selected"):
+                backend.attack(self.parameters(), "bdd")
             unused.assert_not_called()
             unbounded.side_effect = RuntimeError("attack failed")
             with self.assertRaisesRegex(EstimationError, "bdd_mitm_hybrid failed"):
-                backend.estimate(self.parameters())
-            unbounded.side_effect = None
-            finite.return_value = {"rop": backend._oo}
-            with self.assertRaisesRegex(EstimationError, "No attack produced a finite cost"):
-                backend.estimate(self.parameters())
+                backend.attack(self.parameters(), "bdd_mitm_hybrid")
 
 
 if __name__ == "__main__":

@@ -6,12 +6,14 @@ from .parameters import Parameters
 
 
 def estimate(parameters=None, *, n=None, q=None, secret=None, error=None,
-             samples=None, estimators=None, cache=True):
+             samples=None, estimators=None, cache=True,
+             jobs=None, target=None):
     """Estimate parameters or explicit n, q, secret, error, and sample count.
 
     By default, use every applicable registered backend with the MATZOV cost model.
     Return an Evaluation with security_bits and all per-backend attack results.
     Explicit estimators may implement the Estimator protocol in any runtime.
+    jobs attacks run in parallel. With a target, stop at the first attack below it.
     """
     if parameters is None:
         parameters = Parameters(n, q, secret, error, samples)
@@ -24,4 +26,4 @@ def estimate(parameters=None, *, n=None, q=None, secret=None, error=None,
 
         estimators = [SageEstimator(name) for name, backend in BACKENDS.items()
                       if backend.applies is None or backend.applies(parameters)]
-    return evaluate(parameters, estimators, cache=cache)
+    return evaluate(parameters, estimators, cache=cache, jobs=jobs, target=target)

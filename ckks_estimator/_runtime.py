@@ -1,6 +1,7 @@
 """Persistent subprocess transport for Sage-dependent backends."""
 
 import atexit
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
@@ -65,6 +66,15 @@ class Worker:
             self.log.close()
             self.log = None
 
+    def cancel(self):
+        """Kill a running request from another thread. That request then fails."""
+        process = self.process
+        if process is not None and process.poll() is None:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
     def request(self, operation, **arguments):
         if self.owner != os.getpid():
             raise EstimationError("Create a new estimator in the child process before using it.")
@@ -98,24 +108,42 @@ class Worker:
             return response["result"]
 
 
-_workers = {}
+class Pool:
+    """Workers for one runtime command, started on demand and reused."""
+
+    def __init__(self, command):
+        self.command = command
+        self.idle = []
+        self.lock = Lock()
+
+    @contextmanager
+    def worker(self):
+        with self.lock:
+            selected = self.idle.pop() if self.idle else Worker(self.command)
+        try:
+            yield selected
+        finally:
+            with self.lock:
+                self.idle.append(selected)
+
+
+_pools = {}
 _lock = Lock()
 
 
 def _after_fork():
     global _lock
     _lock = Lock()
-    _workers.clear()
+    _pools.clear()
 
 
 if hasattr(os, "register_at_fork"):
     os.register_at_fork(after_in_child=_after_fork)
 
 
-def worker(sage=None):
+def pool(sage=None):
     command = runtime_command(sage)
-    key = (os.getpid(), command)
     with _lock:
-        if key not in _workers:
-            _workers[key] = Worker(command)
-        return _workers[key]
+        if command not in _pools:
+            _pools[command] = Pool(command)
+        return _pools[command]

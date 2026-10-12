@@ -46,15 +46,14 @@ class TabOgTests(unittest.TestCase):
             ("primal-mitm-square-root", {"babai": True, "mitm": True, "mitm_heuristic": "square root"}),
             ("primal-mitm-estimator", {"babai": True, "mitm": True, "mitm_heuristic": "estimator"}),
         )
-        result = self.backend.estimate(self.parameters())
-        self.assertEqual(tuple(attack.attack for attack in result.attacks), tuple(name for name, _ in expected))
-        for attack, (_, options) in zip(result.attacks, expected):
+        self.assertEqual(self.backend.attacks, tuple(name for name, _ in expected))
+        result = [self.backend.attack(self.parameters(), name) for name in self.backend.attacks]
+        for attack, (_, options) in zip(result, expected):
             direct = reference.rot_primal_hybrid(native, poly_degree=256, red_cost_model=RC.MATZOV,
                                                  red_shape_model=Simulator.GSA, **options)
             bits = RealField(128, rnd="RNDD")(direct["rop"]).log2()
             self.assertEqual(str(attack.security_bits), bits.str(truncate=False))
-        self.assertEqual(result.revision, self.backend.revision)
-        self.assertEqual(result.configuration["attacks"], tuple(name for name, _ in expected))
+        self.assertEqual(self.backend.configuration, {"shape_model": "GSA"})
 
     def test_applicability_selection_and_failure(self):
         self.assertTrue(self.backend.supports(self.parameters()))
@@ -64,17 +63,17 @@ class TabOgTests(unittest.TestCase):
             with self.subTest(parameters=parameters):
                 self.assertFalse(self.backend.supports(parameters))
                 with self.assertRaises(UnsupportedParameters):
-                    self.backend.estimate(parameters)
+                    self.backend.attack(parameters, "primal-without-mitm")
         backend = TabOgEstimator(TABOG_PATH, attacks=("primal-mitm-estimator",))
         with patch.object(backend._rotated, "rot_primal_hybrid", return_value={"rop": 2**127}) as attack:
-            result = backend.estimate(self.parameters())
-            self.assertEqual(len(result.attacks), 1)
+            self.assertEqual(backend.attacks, ("primal-mitm-estimator",))
+            backend.attack(self.parameters(), "primal-mitm-estimator")
             attack.assert_called_once()
             self.assertEqual(attack.call_args.kwargs["poly_degree"], 256)
             self.assertEqual(attack.call_args.kwargs["mitm_heuristic"], "estimator")
             attack.side_effect = RuntimeError("failed")
             with self.assertRaisesRegex(EstimationError, "primal-mitm-estimator failed"):
-                backend.estimate(self.parameters())
+                backend.attack(self.parameters(), "primal-mitm-estimator")
 
     def test_revision_and_imports_follow_the_pinned_dependency(self):
         original = Path(TABOG_PATH).resolve() / "PrimalHybrid"
