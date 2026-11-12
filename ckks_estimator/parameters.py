@@ -21,6 +21,12 @@ class SparseTernary:
         _integer("positive", self.positive, 0)
         _integer("negative", self.negative, 0)
 
+    @classmethod
+    def weight(cls, h: int) -> "SparseTernary":
+        """Hamming weight h, with h // 2 coefficients equal to +1 and the rest to -1."""
+        _integer("h", h, 0)
+        return cls(h // 2, h - h // 2)
+
     @property
     def h(self) -> int:
         return self.positive + self.negative

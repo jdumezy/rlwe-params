@@ -5,26 +5,19 @@ from dataclasses import replace
 from decimal import Decimal
 
 from .evaluation import default_jobs, evaluate
-from .installation import BACKENDS
 from .parameters import Parameters
+from .profiles import profile as _profile
 from .search import search_logq
 
 
-def _default_estimators(parameters):
-    from .estimators import SageEstimator
-
-    return [SageEstimator(name) for name, backend in BACKENDS.items()
-            if backend.applies is None or backend.applies(parameters)]
-
-
 def estimate(parameters=None, *, n=None, q=None, secret=None, error=None,
-             samples=None, estimators=None, cache=True,
+             samples=None, profile="matzov", estimators=None, cache=True,
              jobs=None, target=None):
     """Estimate parameters or explicit n, q, secret, error, and sample count.
 
-    By default, use every applicable registered backend with the MATZOV cost model.
-    Return an Evaluation with security_bits and all per-backend attack results.
-    Explicit estimators may implement the Estimator protocol in any runtime.
+    Use every applicable backend of the profile, or explicit estimators that
+    implement the Estimator protocol in any runtime. Return an Evaluation with
+    security_bits and all per-backend attack results.
     jobs attacks run in parallel. With a target, stop at the first attack below it.
     """
     if parameters is None:
@@ -34,7 +27,7 @@ def estimate(parameters=None, *, n=None, q=None, secret=None, error=None,
     elif any(value is not None for value in (n, q, secret, error, samples)):
         raise ValueError("Supply either parameters or individual parameter fields.")
     if estimators is None:
-        estimators = _default_estimators(parameters)
+        estimators = _profile(profile).estimators(parameters)
     return evaluate(parameters, estimators, cache=cache, jobs=jobs, target=target)
 
 
@@ -50,7 +43,8 @@ class _Selection:
 
 
 def max_logq(*, n, secret, error, upper, samples=None, target=128, lower=15,
-             guess=None, window=2, estimators=None, cache=True, jobs=None, progress=None):
+             guess=None, window=2, profile="matzov", estimators=None, cache=True, jobs=None,
+             progress=None):
     """Search q=2**logq with search_logq(), returning a certified SearchResult.
 
     Use the same distributions, sample count, and backends at every point.
@@ -61,7 +55,7 @@ def max_logq(*, n, secret, error, upper, samples=None, target=128, lower=15,
     """
     jobs = default_jobs() if jobs is None else jobs
     reference = Parameters(n, 2, secret, error, samples)
-    estimators = _default_estimators(reference) if estimators is None else tuple(estimators)
+    estimators = tuple(_profile(profile).estimators(reference) if estimators is None else estimators)
     if len({estimator.name for estimator in estimators}) != len(estimators):
         raise ValueError("Estimator names must be distinct.")
     if guess is None and type(lower) is int and type(upper) is int:

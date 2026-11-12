@@ -1,6 +1,5 @@
 """Backend registry and pinned source installation. Requires Git, but not Sage."""
 
-import argparse
 import os
 from pathlib import Path
 import subprocess
@@ -101,18 +100,3 @@ def install_backend(name: str, *, directory=None) -> Path:
         checkout.rename(destination)
     return destination
 
-
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("backends", nargs="+", choices=tuple(BACKENDS))
-    parser.add_argument("--directory", type=Path, help="Backend installation directory.")
-    arguments = parser.parse_args()
-    try:
-        for name in arguments.backends:
-            print(install_backend(name, directory=arguments.directory))
-    except (OSError, RuntimeError) as exc:
-        parser.exit(1, f"{exc}\n")
-
-
-if __name__ == "__main__":
-    main()

@@ -53,8 +53,9 @@ class ApiTests(unittest.TestCase):
             result = estimate(self.parameters, cache=False)
             self.assertEqual(len(result.estimates), 2)
             self.assertEqual([call.args for call in adapter.call_args_list], [("malb",), ("tabog",)])
+            self.assertEqual({call.kwargs["cost_model"] for call in adapter.call_args_list}, {"MATZOV"})
 
-        def missing(name):
+        def missing(name, **options):
             if name == "tabog":
                 raise ValueError("missing")
             return Backend()
@@ -78,7 +79,7 @@ class ApiTests(unittest.TestCase):
         result = estimate(self.parameters, estimators=[Backend()], cache=False)
         output = io.StringIO()
         with patch("ckks_estimator.cli.estimate", return_value=result) as call, redirect_stdout(output):
-            main(["estimate", "--log-n", "8", "--log-q", "15", "--sparse", "8", "8",
+            main(["estimate", "--log-n", "8", "--log-q", "15", "--h", "16",
                   "--sigma", "3.2", "--samples", "512", "--no-cache", "--json"])
         supplied = call.call_args.args[0]
         self.assertEqual((supplied.n, supplied.q, supplied.samples), (256, 2**15, 512))
@@ -130,7 +131,7 @@ class RuntimeIntegrationTests(unittest.TestCase):
                 self.assertEqual(estimate(parameters, cache=cache), result)
             self.assertEqual([runtime.process for runtime in workers], processes)
             command = [sys.executable, "-m", "ckks_estimator", "estimate", "--log-n", "8",
-                       "--log-q", "15", "--sparse", "8", "8", "--sigma", "3.2",
+                       "--log-q", "15", "--h", "16", "--sigma", "3.2",
                        "--cache", str(cache), "--json"]
             output = subprocess.run(command, check=True, capture_output=True, text=True)
             document = json.loads(output.stdout)

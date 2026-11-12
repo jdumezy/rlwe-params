@@ -191,7 +191,7 @@ class MaxLogqTests(unittest.TestCase):
     def test_cli_search_reports_the_certified_boundary(self):
         backend = Backend("first", {"binding": hyperbola(14000)})
         result = max_logq(estimators=[backend], cache=False, guess=109, **self.options)
-        arguments = ["search", "--log-n", "12", "--sparse", "16", "16", "--sigma", "3.2",
+        arguments = ["search", "--log-n", "12", "--h", "32", "--sigma", "3.2",
                      "--upper", "2000", "--target", "128", "--guess", "100", "--no-cache"]
         output = io.StringIO()
         with patch("ckks_estimator.cli.max_logq", return_value=result) as call, redirect_stdout(output):
@@ -210,7 +210,7 @@ class MaxLogqTests(unittest.TestCase):
                 main([*arguments, "--details", "--progress"])
         self.assertIn("logq=109 (q=2**109)", output.getvalue())
         self.assertIn("logq=109 (all attacks) / first / binding", output.getvalue())
-        self.assertIn("logq=110: 127.27 bits (first / binding), binding attacks", errors.getvalue())
+        self.assertIn("logq=110: 127.27 bits (first / binding), binding attack", errors.getvalue())
 
 
 if __name__ == "__main__":

@@ -32,7 +32,8 @@ def runtime_command(sage=None):
     executable = shutil.which("sage")
     if executable:
         return (executable,)
-    raise RuntimeError("Backend runtime is missing. Run 'ckks-estimator setup' once.")
+    raise RuntimeError("SageMath was not found. Install it, pass --sage PATH, "
+                       "or use the Docker image.")
 
 
 class Worker:
