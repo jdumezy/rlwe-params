@@ -8,7 +8,7 @@ RUN apt-get update \
 
 USER sage
 WORKDIR /home/sage/rlwe-params
-COPY --chown=sage:sage pyproject.toml ./
+COPY --chown=sage:sage pyproject.toml README.md LICENSE ./
 COPY --chown=sage:sage rlwe_params ./rlwe_params
 ENV RLWE_PARAMS_BACKENDS=/home/sage/backends
 RUN sage -python -m pip install --no-deps --no-build-isolation . \

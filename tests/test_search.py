@@ -39,11 +39,11 @@ class SearchTests(unittest.TestCase):
         result = search_logq(evaluate, upper=upper, target=target, **options)
         self.assertEqual(len(requests), len(set(requests)))
         truth = lambda point: min(curve(point) for curve in curves.values())
-        for point in result.certified:
+        for point in result.complete:
             self.assertEqual(set(result.costs[point]), set(curves))
             self.assertGreaterEqual(truth(point), result.target)
         if result.logq is not None:
-            self.assertIn(result.logq, result.certified)
+            self.assertIn(result.logq, result.complete)
             self.assertEqual(result.security_bits, truth(result.logq))
             start, stop = result.checked_interval
             self.assertTrue(all(result.evaluations[point] >= result.target
@@ -75,11 +75,11 @@ class SearchTests(unittest.TestCase):
             self.assertLessEqual(len(full), 3)
             self.assertLessEqual(len(requests), 30)
 
-    def test_refuted_certification_follows_the_refuting_attack_and_resumes(self):
+    def test_refuted_boundary_follows_the_refuting_attack_and_resumes(self):
         curves = {"first": hyperbola(14000), "late": lambda point: 150 if point < 105 else 100}
         for early in (True, False):
             result, requests, full = self.run_curves(curves, guess=100, early=early)
-            self.assertEqual((result.logq, result.certified), (104, (100, 104)))
+            self.assertEqual((result.logq, result.complete), (104, (100, 104)))
             self.assertEqual(full, [100, 109, 104])
             self.assertLess(result.costs[105]["late"], 128)
             self.assertEqual(requests[requests.index((109, None)) + 1][1], ("late",))
@@ -158,7 +158,7 @@ class Backend:
 class MaxLogqTests(unittest.TestCase):
     options = {"n": 4096, "secret": SparseTernary(16, 16), "error": DiscreteGaussian("3.2"), "upper": 2000}
 
-    def test_only_binding_attacks_run_away_from_certified_points(self):
+    def test_only_binding_attacks_run_away_from_complete_points(self):
         for jobs in (1, 4):
             with self.subTest(jobs=jobs), tempfile.TemporaryDirectory() as directory:
                 cache = Path(directory) / "estimates.sqlite3"
@@ -171,9 +171,9 @@ class MaxLogqTests(unittest.TestCase):
                 self.assertEqual(set(result.costs[109]),
                                  {"first / binding", "first / slow", "second / other"})
                 self.assertEqual(sorted(point for point, name in first.calls if name == "slow"),
-                                 sorted(result.certified))
+                                 sorted(result.complete))
                 self.assertEqual(len(first.calls), len(set(first.calls)))
-                self.assertEqual({point for point, _, full in events if full}, set(result.certified))
+                self.assertEqual({point for point, _, full in events if full}, set(result.complete))
                 self.assertEqual(events[0][0], 108)
                 repeated = Backend("first", first.curves)
                 self.assertEqual(max_logq(estimators=[repeated, second], cache=cache, jobs=jobs,
@@ -202,7 +202,7 @@ class MaxLogqTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "distinct"):
             max_logq(estimators=[backend, Backend("first", backend.curves)], cache=False, **self.options)
 
-    def test_cli_search_reports_the_certified_boundary(self):
+    def test_cli_search_reports_the_boundary(self):
         backend = Backend("first", {"binding": hyperbola(14000)})
         result = max_logq(estimators=[backend], cache=False, guess=109, **self.options)
         arguments = ["search", "--log-n", "12", "--h", "32", "--sigma", "3.2",
@@ -213,7 +213,7 @@ class MaxLogqTests(unittest.TestCase):
         self.assertEqual((call.call_args.kwargs["n"], call.call_args.kwargs["guess"]), (4096, 100))
         self.assertFalse(call.call_args.kwargs["cache"])
         document = json.loads(output.getvalue())
-        self.assertEqual((document["logq"], document["status"], document["certified"]),
+        self.assertEqual((document["logq"], document["status"], document["complete"]),
                          (109, "boundary", [109]))
         self.assertEqual(document["costs"]["109"], {"first / binding": str(result.security_bits)})
         output, errors = io.StringIO(), io.StringIO()

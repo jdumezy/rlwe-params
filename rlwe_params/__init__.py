@@ -1,4 +1,4 @@
-"""Certified RLWE parameter selection and tables, using lattice estimators as backends."""
+"""RLWE parameter selection and tables, using lattice estimators as backends."""
 
 from .backend import EstimationError, Estimator, UnsupportedParameters
 from .api import estimate, max_logq

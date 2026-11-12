@@ -88,7 +88,7 @@ def _print_search(result, arguments):
         print(json.dumps({
             "logq": result.logq, "security_bits": None if result.logq is None else str(result.security_bits),
             "target": str(result.target), "status": result.status,
-            "checked_interval": result.checked_interval, "certified": result.certified,
+            "checked_interval": result.checked_interval, "complete": result.complete,
             "costs": {str(point): {attack: str(bits) for attack, bits in costs.items()}
                       for point, costs in result.costs.items()},
         }, indent=2))
@@ -101,7 +101,7 @@ def _print_search(result, arguments):
             print("The upper search bound is safe.")
     if arguments.details:
         for point, costs in result.costs.items():
-            scope = "all attacks" if point in result.certified else "partial"
+            scope = "all attacks" if point in result.complete else "partial"
             for attack, bits in costs.items():
                 print(f"logq={point} ({scope}) / {attack}: {bits} bits")
 
@@ -144,8 +144,8 @@ def main(argv=None):
     modulus.add_argument("--log-q", type=_positive, help="Modulus is exactly 2**LOG_Q.")
 
     search = commands.add_parser(
-        "search", help="Find the largest certified logq for a security target.",
-        description="Locate the boundary with the binding attack, then certify it with all attacks. "
+        "search", help="Find the largest logq that meets a security target.",
+        description="Locate the boundary with the binding attack, then evaluate every attack there. "
                     "Assumes a mostly decreasing curve with small, rare irregularities.")
     _parameters(search)
     _search_bounds(search, "Largest allowed logq. Default: n // 16.")

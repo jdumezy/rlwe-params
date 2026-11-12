@@ -45,7 +45,7 @@ class _Selection:
 def max_logq(*, n, secret, error, upper, samples=None, target=128, lower=15,
              guess=None, window=2, profile="matzov", estimators=None, cache=True, jobs=None,
              progress=None, prior=()):
-    """Search q=2**logq with search_logq(), returning a certified SearchResult.
+    """Search q=2**logq with search_logq(), returning a SearchResult.
 
     Use the same distributions, sample count, and backends at every point.
     Only the binding attacks run while locating the boundary. Every attack

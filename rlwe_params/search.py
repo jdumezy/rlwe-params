@@ -12,10 +12,10 @@ Request = Tuple[int, Optional[Tuple[str, ...]]]
 
 @dataclass(frozen=True)
 class SearchResult:
-    """Largest certified logq before the first observed unsafe point.
+    """Largest logq before the first observed unsafe point, with every attack evaluated.
 
-    Every attack was evaluated at the certified points and none is below the
-    target. At other points, costs holds only the attacks that were evaluated,
+    complete lists the points where every attack was evaluated. At logq, none
+    is below the target. At other points, costs holds only the attacks that were evaluated,
     so their minimum is an upper bound on security. An upper_bound result means
     the search limit is safe, not that the global maximum has been found.
     """
@@ -23,7 +23,7 @@ class SearchResult:
     logq: Optional[int]
     target: Decimal
     costs: Mapping[int, Mapping[str, Decimal]]
-    certified: Tuple[int, ...]
+    complete: Tuple[int, ...]
     checked_interval: Tuple[int, int]
     status: str
 
@@ -43,7 +43,7 @@ class SearchResult:
 def search_logq(evaluate: Callable[[Sequence[Request]], Sequence[Mapping[str, Decimal]]], *,
                 upper: int, target=128, lower: int = 15, guess: Optional[int] = None,
                 window: int = 2, batch: int = 1) -> SearchResult:
-    """Locate the boundary with the binding attacks, then certify it with all attacks.
+    """Locate the boundary with the binding attacks, then evaluate every attack there.
 
     evaluate receives (logq, attacks) requests and returns the named attack
     costs for each. attacks=None requests every attack. That evaluation may stop
@@ -53,7 +53,7 @@ def search_logq(evaluate: Callable[[Sequence[Request]], Sequence[Mapping[str, De
     surrogate. The surrogate locates adjacent safe and unsafe points, modelling
     1/bits as linear in logq. The boundary is then fully evaluated. An attack
     refuting it becomes the surrogate and the search resumes below. Finally the
-    surrogate checks window points below the certified boundary. batch surrogate
+    surrogate checks window points below the boundary. batch surrogate
     points are requested at once.
     Without a guess, start at the middle of the interval. Errors propagate.
     """
@@ -66,7 +66,7 @@ def search_logq(evaluate: Callable[[Sequence[Request]], Sequence[Mapping[str, De
     target = Decimal(str(target))
     if not target.is_finite() or target <= 0:
         raise ValueError("target must be finite and positive.")
-    known, certified, surrogate = {}, set(), []
+    known, complete, surrogate = {}, set(), []
 
     def store(point, costs):
         for attack, bits in costs.items():
@@ -75,14 +75,14 @@ def search_logq(evaluate: Callable[[Sequence[Request]], Sequence[Mapping[str, De
                 raise ValueError("Security estimates must be nonnegative and not NaN.")
             known.setdefault(point, {})[attack] = bits
 
-    def certify(point):
+    def evaluate_all(point):
         (costs,) = evaluate([(point, None)])
         if not costs:
             raise ValueError("A full evaluation returned no attack.")
         store(point, costs)
         binding = min(known[point], key=lambda attack: (known[point][attack], attack))
         if known[point][binding] >= target:
-            certified.add(point)
+            complete.add(point)
         if not surrogate or known[point][binding] < target:
             # Attacks that held here are assumed to hold below, so only this one is tracked.
             surrogate[:] = [binding]
@@ -100,7 +100,7 @@ def search_logq(evaluate: Callable[[Sequence[Request]], Sequence[Mapping[str, De
         costs = known.get(point, {})
         if any(bits < target for bits in costs.values()):
             return False
-        if point in certified or all(attack in costs for attack in surrogate):
+        if point in complete or all(attack in costs for attack in surrogate):
             return True
         return None
 
@@ -129,9 +129,9 @@ def search_logq(evaluate: Callable[[Sequence[Request]], Sequence[Mapping[str, De
         interval = (lower, lower) if logq is None else (
             max(lower, logq - window), min(upper, logq + 1))
         return SearchResult(logq, target, {point: dict(known[point]) for point in sorted(known)},
-                            tuple(sorted(certified)), interval, status)
+                            tuple(sorted(complete)), interval, status)
 
-    certify((lower + upper) // 2 if guess is None else guess)
+    evaluate_all((lower + upper) // 2 if guess is None else guess)
     step, width, bisect = 1, None, False
     while True:
         unsafe = [point for point in known if safe(point) is False]
@@ -161,8 +161,8 @@ def search_logq(evaluate: Callable[[Sequence[Request]], Sequence[Mapping[str, De
             probe([candidate for candidate in range(point, point + speculative)
                    if candidate <= last or candidate == hi])
             continue
-        if lo not in certified:
-            certify(lo)
+        if lo not in complete:
+            evaluate_all(lo)
             continue
         scan = [point for point in range(max(lower, lo - window), lo) if safe(point) is None]
         if scan:

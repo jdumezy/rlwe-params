@@ -1,6 +1,8 @@
 *
 !Dockerfile
 !pyproject.toml
+!README.md
+!LICENSE
 !rlwe_params/
 !rlwe_params/**
 **/__pycache__/

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 100" width="440" height="100" role="img" aria-labelledby="title">
+  <title id="title">rlwe-params</title>
+  <style>
+    .ring { fill: none; stroke: #2f6f9f; stroke-width: 3; }
+    .chord { fill: none; stroke: #2f6f9f; stroke-width: 1.5; opacity: 0.35; }
+    .root { fill: #2f6f9f; }
+    .key { fill: #e07a2f; }
+    .lattice { fill: #2f6f9f; opacity: 0.45; }
+    .word { fill: #1f2933; font: 600 44px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .suffix { fill: #2f6f9f; }
+    @media (prefers-color-scheme: dark) {
+      .ring, .chord { stroke: #7fb8e6; }
+      .root, .lattice, .suffix { fill: #7fb8e6; }
+      .key { fill: #f0a060; }
+      .word { fill: #e6edf3; }
+    }
+  </style>
+  <g transform="translate(50 50)">
+    <circle class="ring" r="36"/>
+    <path class="chord" d="M36 0 L-25.46 25.46 M0 -36 L0 36 M-36 0 L25.46 -25.46"/>
+    <g class="lattice">
+      <circle cx="-12" cy="-12" r="2.2"/><circle cx="0" cy="-12" r="2.2"/><circle cx="12" cy="-12" r="2.2"/>
+      <circle cx="-12" cy="0" r="2.2"/><circle cx="0" cy="0" r="2.2"/><circle cx="12" cy="0" r="2.2"/>
+      <circle cx="-12" cy="12" r="2.2"/><circle cx="0" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/>
+    </g>
+    <circle class="root" cx="36" cy="0" r="5"/>
+    <circle class="root" cx="25.46" cy="25.46" r="5"/>
+    <circle class="key" cx="0" cy="36" r="6"/>
+    <circle class="root" cx="-25.46" cy="25.46" r="5"/>
+    <circle class="root" cx="-36" cy="0" r="5"/>
+    <circle class="key" cx="-25.46" cy="-25.46" r="6"/>
+    <circle class="root" cx="0" cy="-36" r="5"/>
+    <circle class="root" cx="25.46" cy="-25.46" r="5"/>
+  </g>
+  <text x="104" y="65" class="word">rlwe<tspan class="suffix">-params</tspan></text>
+</svg>

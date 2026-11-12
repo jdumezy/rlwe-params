@@ -1,4 +1,4 @@
-"""Tables of the largest certified logq over ring dimensions, secrets, and targets."""
+"""Tables of the largest logq meeting a security target, over ring dimensions and secrets."""
 
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from decimal import Decimal
@@ -66,7 +66,7 @@ class _Stoppable:
 
 
 def _prior(records, log_n, label, target):
-    """Rank attacks by their certified costs in the nearest completed cell with this secret."""
+    """Rank attacks by their boundary costs in the nearest completed cell with this secret."""
     candidates = [record for record in records.values()
                   if record["secret"] == label and record["costs"]]
     if not candidates:
@@ -108,8 +108,8 @@ def _markdown(settings, records, log_ns, labels, target):
     lines += [
         "",
         f"Each cell is the largest `logq`, with `q = 2^logq` the largest attacked modulus, "
-        f"such that every attack costs at least {target} bits at that `logq`, and the next "
-        f"`logq` has an attack below {target} bits. Integer `logq` from {settings['lower']} "
+        f"such that every attack of the estimators below costs at least {target} bits at that "
+        f"`logq`, and the next `logq` has an attack below {target} bits. Integer `logq` from {settings['lower']} "
         f"to the upper bound were searched. `--`: the lower bound already fails. "
         f"`>=U`: the upper bound `U` meets the target. Empty: not computed.",
         "",
