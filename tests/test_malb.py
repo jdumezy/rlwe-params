@@ -13,6 +13,7 @@ from rlwe_params import (
 )
 from rlwe_params.adapters._source import source_revision
 from rlwe_params.adapters.malb import ATTACKS, DEFAULT_ATTACKS, MalbAdapter as MalbEstimator
+from rlwe_params.installation import backend_path
 
 
 class SourceTests(unittest.TestCase):
@@ -33,7 +34,9 @@ class SourceTests(unittest.TestCase):
             self.assertNotEqual(original, source_revision({"backend": clone}, {"sage": "changed"}))
 
 
-MALB_PATH = os.environ.get("MALB_ESTIMATOR_PATH")
+# Default to the installed sources when the backend tests are enabled.
+MALB_PATH = os.environ.get("MALB_ESTIMATOR_PATH") or (
+    str(backend_path("malb")) if os.environ.get("RLWE_PARAMS_TEST_SAGE") else None)
 
 
 @unittest.skipUnless(MALB_PATH and importlib.util.find_spec("sage"),

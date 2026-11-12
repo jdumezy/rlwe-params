@@ -11,15 +11,21 @@ The plain tests need only Python.
 python3 -m unittest discover -s tests
 ```
 
-The backend tests also need Sage and the installed estimator sources.
+The backend tests also need Sage and the sources installed by `rlwe-params setup`.
 
 ```bash
-B=~/.local/share/rlwe-params/backends
-RLWE_PARAMS_TEST_SAGE=1 \
-MALB_ESTIMATOR_PATH=$B/malb-6019056011d10d7e9c30a0d5da2d2f729fbc2eec \
-TABOG_ESTIMATOR_PATH=$B/tabog-a92f335665eef69927d2d8f49832bd595a6dac32 \
-sage -python -m unittest discover -s tests
+RLWE_PARAMS_TEST_SAGE=1 sage -python -m unittest discover -s tests
 ```
+
+Or, with Docker only:
+
+```bash
+docker build -t rlwe-params .
+docker run --rm -v "$PWD:/src:ro" -w /src -e RLWE_PARAMS_TEST_SAGE=1 -e PYTHONDONTWRITEBYTECODE=1 \
+  --entrypoint sage rlwe-params -python -m unittest discover -s tests
+```
+
+GitHub Actions runs the plain tests on every push, and the backend tests in Docker weekly or on demand.
 
 ## How backends work
 

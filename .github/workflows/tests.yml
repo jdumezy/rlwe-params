@@ -1,0 +1,36 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+
+jobs:
+  plain:
+    name: Plain tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+
+  backends:
+    name: Backend tests (Sage, Docker)
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t rlwe-params .
+      - run: >
+          docker run --rm -v "$PWD:/src:ro" -w /src
+          -e RLWE_PARAMS_TEST_SAGE=1 -e PYTHONDONTWRITEBYTECODE=1
+          --entrypoint sage rlwe-params -python -m unittest discover -s tests -v

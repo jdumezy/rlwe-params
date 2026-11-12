@@ -13,9 +13,12 @@ from rlwe_params import (
     UnsupportedParameters,
 )
 from rlwe_params.adapters.tabog import TabOgAdapter as TabOgEstimator
+from rlwe_params.installation import backend_path
 
 
-TABOG_PATH = os.environ.get("TABOG_ESTIMATOR_PATH")
+# Default to the installed sources when the backend tests are enabled.
+TABOG_PATH = os.environ.get("TABOG_ESTIMATOR_PATH") or (
+    str(backend_path("tabog")) if os.environ.get("RLWE_PARAMS_TEST_SAGE") else None)
 
 
 @unittest.skipUnless(TABOG_PATH and importlib.util.find_spec("sage"),
