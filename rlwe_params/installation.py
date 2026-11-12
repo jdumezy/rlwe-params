@@ -36,7 +36,7 @@ BACKENDS = {
     "malb": Backend(
         ("{sage}", "-python", "-m", "rlwe_params.adapters.malb"),
         url="https://github.com/malb/lattice-estimator.git",
-        revision="6019056011d10d7e9c30a0d5da2d2f729fbc2eec",
+        revision="7d59f866655362ea8eab803dbc833710c2bc362a",
         source="estimator/__init__.py",
     ),
     "tabog": Backend(
