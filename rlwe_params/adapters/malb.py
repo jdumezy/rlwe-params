@@ -1,4 +1,4 @@
-"""Adapter for malb/lattice-estimator."""
+"""Backend program for malb/lattice-estimator. Runs in Sage."""
 
 from decimal import Decimal
 from functools import partial
@@ -9,6 +9,7 @@ import sys
 from ..backend import EstimationError, UnsupportedParameters
 from ..installation import backend_path
 from ..parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary, Uniform
+from ..protocol import serve
 from ..results import AttackEstimate
 from ._source import source_revision
 
@@ -20,7 +21,7 @@ ATTACKS = ("arora-gb", "bkw", "usvp", "bdd", "bdd_hybrid", "bdd_mitm_hybrid",
 DEFAULT_ATTACKS = tuple(name for name in ATTACKS if name not in ("arora-gb", "bkw"))
 
 
-class MalbEstimator:
+class MalbAdapter:
     """Use installed or explicit lattice-estimator sources. Requires Sage.
 
     attacks=None selects DEFAULT_ATTACKS. Pass ATTACKS to include arora-gb and bkw.
@@ -143,3 +144,7 @@ class MalbEstimator:
             return AttackEstimate(name, self._bits(cost["rop"]))
         except Exception as exc:
             raise EstimationError(f"Invalid malb result: {exc}") from exc
+
+
+if __name__ == "__main__":
+    serve(MalbAdapter)

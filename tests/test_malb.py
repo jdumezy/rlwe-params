@@ -11,8 +11,8 @@ from rlwe_params import (
     DiscreteGaussian, EstimationError, Parameters, SparseTernary, Ternary,
     Uniform, UnsupportedParameters,
 )
-from rlwe_params.estimators._malb import ATTACKS, DEFAULT_ATTACKS, MalbEstimator
-from rlwe_params.estimators._source import source_revision
+from rlwe_params.adapters._source import source_revision
+from rlwe_params.adapters.malb import ATTACKS, DEFAULT_ATTACKS, MalbAdapter as MalbEstimator
 
 
 class SourceTests(unittest.TestCase):

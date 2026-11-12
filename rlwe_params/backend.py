@@ -18,8 +18,7 @@ class Estimator(Protocol):
     """Interface for a configured estimator.
 
     attacks names the selected attacks, each evaluated and cached separately.
-    configuration holds every other setting that affects a cost. It uses
-    string-keyed dictionaries, lists, tuples, JSON scalars, and finite Decimals.
+    configuration holds every other setting that affects a cost, as JSON.
     cost_model must identify comparable work units.
 
     Parallel evaluation calls attack() from several threads. An estimator may

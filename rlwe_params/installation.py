@@ -10,18 +10,19 @@ from .parameters import Parameters, SparseTernary
 
 
 class Backend(NamedTuple):
-    """Pinned sources and the adapter that evaluates them in the Sage worker.
+    """How to run a backend, and the pinned sources it needs, if any.
 
-    source is a file whose presence identifies a checkout. adapter is a
-    "module:class" reference imported only inside the worker. applies selects
-    the backend by default, without Sage. None selects it for all parameters.
+    command starts a program that speaks the protocol in protocol.py. "{sage}"
+    expands to the Sage command. url and revision pin sources that setup
+    installs, and source is a file that identifies a checkout. applies selects
+    the backend by default in plain Python. None selects it for all parameters.
     """
 
-    url: str
-    revision: str
+    command: Tuple[str, ...]
+    url: Optional[str] = None
+    revision: Optional[str] = None
     submodules: Tuple[str, ...] = ()
-    source: str = ""
-    adapter: str = ""
+    source: Optional[str] = None
     applies: Optional[Callable[[Parameters], bool]] = None
 
 
@@ -30,33 +31,38 @@ def _sparse_power_of_two(parameters):
             and parameters.n >= 2 and parameters.n & (parameters.n - 1) == 0)
 
 
-# Adding a backend takes an entry here and its adapter module.
+# Adding a backend takes an entry here and a program that speaks the protocol.
 BACKENDS = {
     "malb": Backend(
-        "https://github.com/malb/lattice-estimator.git",
-        "6019056011d10d7e9c30a0d5da2d2f729fbc2eec",
+        ("{sage}", "-python", "-m", "rlwe_params.adapters.malb"),
+        url="https://github.com/malb/lattice-estimator.git",
+        revision="6019056011d10d7e9c30a0d5da2d2f729fbc2eec",
         source="estimator/__init__.py",
-        adapter="rlwe_params.estimators._malb:MalbEstimator",
     ),
     "tabog": Backend(
-        "https://github.com/TabOg/mlwe-hybrids.git",
-        "a92f335665eef69927d2d8f49832bd595a6dac32",
-        ("PrimalHybrid/lattice_estimator",),
+        ("{sage}", "-python", "-m", "rlwe_params.adapters.tabog"),
+        url="https://github.com/TabOg/mlwe-hybrids.git",
+        revision="a92f335665eef69927d2d8f49832bd595a6dac32",
+        submodules=("PrimalHybrid/lattice_estimator",),
         source="PrimalHybrid/lwe_rot_primal.py",
-        adapter="rlwe_params.estimators._tabog:TabOgEstimator",
         applies=_sparse_power_of_two,
     ),
 }
 
 
-def backend_path(name: str, directory=None) -> Path:
-    """Locate pinned sources without installing or modifying them."""
-    if name not in BACKENDS:
-        raise ValueError(f"Unknown backend {name!r}. Choose from {tuple(BACKENDS)}.")
+def backends_root(directory=None) -> Path:
+    """Where pinned sources and the recorded Sage command are kept."""
     if directory is None:
         root = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
         directory = os.environ.get("RLWE_PARAMS_BACKENDS", root / "rlwe-params" / "backends")
-    return Path(directory).expanduser().resolve() / f"{name}-{BACKENDS[name].revision}"
+    return Path(directory).expanduser().resolve()
+
+
+def backend_path(name: str, directory=None) -> Path:
+    """Locate pinned sources without installing or modifying them."""
+    if name not in BACKENDS or BACKENDS[name].url is None:
+        raise ValueError(f"No pinned sources for backend {name!r}.")
+    return backends_root(directory) / f"{name}-{BACKENDS[name].revision}"
 
 
 def _git(path, *arguments):
@@ -82,7 +88,7 @@ def _verify(path, revision, submodules):
 def install_backend(name: str, *, directory=None) -> Path:
     """Install a pinned checkout, or reuse a matching clean installation."""
     destination = backend_path(name, directory)
-    url, revision, submodules = BACKENDS[name][:3]
+    url, revision, submodules = BACKENDS[name][1:4]
     if destination.exists():
         _verify(destination, revision, submodules)
         return destination

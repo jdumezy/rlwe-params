@@ -12,7 +12,7 @@ from rlwe_params import (
     DiscreteGaussian, EstimationError, Parameters, SparseTernary, Ternary,
     UnsupportedParameters,
 )
-from rlwe_params.estimators._tabog import TabOgEstimator
+from rlwe_params.adapters.tabog import TabOgAdapter as TabOgEstimator
 
 
 TABOG_PATH = os.environ.get("TABOG_ESTIMATOR_PATH")

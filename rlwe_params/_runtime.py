@@ -1,4 +1,4 @@
-"""Persistent subprocess transport for Sage-dependent backends."""
+"""Persistent backend processes speaking the JSON-lines protocol."""
 
 import atexit
 from contextlib import contextmanager
@@ -11,19 +11,24 @@ import subprocess
 import tempfile
 from threading import Lock
 
-from .backend import EstimationError, UnsupportedParameters
-from .installation import backend_path
-from ._serialization import dumps, loads
+from .backend import EstimationError
+from .installation import BACKENDS, backends_root
+from .protocol import canonical, raise_error
 
 
-def runtime_command(sage=None):
+# Python adapters import rlwe_params from this checkout or installation.
+_PACKAGE_ROOT = str(Path(__file__).resolve().parent.parent)
+
+
+def sage_command(sage=None):
+    """The command that starts Sage, for backends that need it."""
     executable = sage or os.environ.get("RLWE_PARAMS_SAGE")
     if executable:
         resolved = shutil.which(str(executable))
         if not resolved:
             raise RuntimeError(f"Sage executable not found: {executable}.")
         return (resolved,)
-    configuration = backend_path("malb").parent / "runtime.json"
+    configuration = backends_root() / "runtime.json"
     if configuration.is_file():
         command = json.loads(configuration.read_text())["command"]
         if not isinstance(command, list) or not command or not all(isinstance(s, str) for s in command):
@@ -36,6 +41,14 @@ def runtime_command(sage=None):
                        "or use the Docker image.")
 
 
+def backend_command(name, sage=None):
+    """The command that runs a registered backend, with "{sage}" expanded."""
+    command = []
+    for argument in BACKENDS[name].command:
+        command.extend(sage_command(sage) if argument == "{sage}" else [argument])
+    return tuple(command)
+
+
 class Worker:
     def __init__(self, command):
         self.command = command
@@ -43,7 +56,6 @@ class Worker:
         self.log = None
         self.lock = Lock()
         self.owner = os.getpid()
-        self.generation = 0
         atexit.register(self.close)
 
     def close(self):
@@ -76,26 +88,31 @@ class Worker:
             except ProcessLookupError:
                 pass
 
-    def request(self, operation, **arguments):
+    def request(self, message):
+        """Send one request and return its result, raising the error a backend reports."""
         if self.owner != os.getpid():
             raise EstimationError("Create a new estimator in the child process before using it.")
         with self.lock:
             try:
                 if self.process is None:
                     self.log = tempfile.TemporaryFile()
+                    environment = dict(os.environ, PYTHONUNBUFFERED="1")
+                    environment["PYTHONPATH"] = os.pathsep.join(
+                        filter(None, [_PACKAGE_ROOT, environment.get("PYTHONPATH")]))
                     self.process = subprocess.Popen(
-                        [*self.command, "-python", "-u", str(Path(__file__).with_name("_worker.py"))],
-                        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.log,
-                        text=True, encoding="utf-8", start_new_session=True,
+                        self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                        stderr=self.log, text=True, encoding="utf-8", env=environment,
+                        start_new_session=True,
                     )
-                    self.generation += 1
-                self.process.stdin.write(dumps({"operation": operation, **arguments}) + "\n")
+                self.process.stdin.write(canonical(message) + "\n")
                 self.process.stdin.flush()
                 line = self.process.stdout.readline()
                 if not line:
                     self.log.seek(max(0, self.log.seek(0, 2) - 4000))
                     raise EstimationError("Backend worker exited: " + self.log.read().decode(errors="replace"))
-                response = loads(line)
+                response = json.loads(line)
+                if not isinstance(response, dict) or ("result" in response) == ("error" in response):
+                    raise ValueError(f"Malformed backend response: {line.strip()[:200]}")
             except (OSError, ValueError, EstimationError) as exc:
                 self.close()
                 raise EstimationError(f"Backend runtime failed: {exc}") from exc
@@ -103,14 +120,12 @@ class Worker:
                 self.close()
                 raise
             if "error" in response:
-                error = {"UnsupportedParameters": UnsupportedParameters, "ValueError": ValueError,
-                         "TypeError": TypeError}.get(response["error"], EstimationError)
-                raise error(response["message"])
+                raise_error(response["error"])
             return response["result"]
 
 
 class Pool:
-    """Workers for one runtime command, started on demand and reused."""
+    """Workers for one backend command, started on demand and reused."""
 
     def __init__(self, command):
         self.command = command
@@ -142,8 +157,8 @@ if hasattr(os, "register_at_fork"):
     os.register_at_fork(after_in_child=_after_fork)
 
 
-def pool(sage=None):
-    command = runtime_command(sage)
+def pool(command):
+    command = tuple(command)
     with _lock:
         if command not in _pools:
             _pools[command] = Pool(command)

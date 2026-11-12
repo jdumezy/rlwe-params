@@ -32,7 +32,7 @@ def _common(query):
                        help="Cost model, shape model, and attacks. Default: matzov.")
     query.add_argument("--backend", choices=tuple(BACKENDS), action="append",
                        help="Restrict the profile's backends. Default: all applicable backends.")
-    query.add_argument("--jobs", type=_positive, help="Parallel Sage workers. Default: at most 4.")
+    query.add_argument("--jobs", type=_positive, help="Parallel backend processes. Default: at most 4.")
     caching = query.add_mutually_exclusive_group()
     caching.add_argument("--no-cache", action="store_true")
     caching.add_argument("--cache", type=Path, help="Use this cache database.")

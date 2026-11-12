@@ -47,7 +47,7 @@ class InstallationTests(unittest.TestCase):
         (source / "later.py").write_text("# Later revision.\n")
         git(source, "add", ".")
         git(source, "commit", "--quiet", "-m", "Later source")
-        with patch("rlwe_params.installation.BACKENDS", {"malb": Backend(str(source), revision)}):
+        with patch("rlwe_params.installation.BACKENDS", {"malb": Backend((), str(source), revision)}):
             installed = install_backend("malb")
             self.assertEqual(installed, backend_path("malb"))
             self.assertEqual(git(installed, "rev-parse", "HEAD"), revision)
@@ -74,7 +74,7 @@ class InstallationTests(unittest.TestCase):
         git(dependency, "add", ".")
         git(dependency, "commit", "--quiet", "-m", "Advance dependency")
         with patch("rlwe_params.installation.BACKENDS",
-                   {"tabog": Backend(str(source), revision, (submodule,))}):
+                   {"tabog": Backend((), str(source), revision, (submodule,))}):
             installed = install_backend("tabog")
             self.assertEqual(git(installed / submodule, "rev-parse", "HEAD"), dependency_revision)
             self.assertFalse((installed / "unused").exists())
@@ -85,7 +85,7 @@ class InstallationTests(unittest.TestCase):
 
     def test_failed_download_is_not_published_and_adapters_do_not_install(self):
         source, _ = self.repository("malb", "estimator/__init__.py")
-        with patch("rlwe_params.installation.BACKENDS", {"malb": Backend(str(source), "0" * 40)}):
+        with patch("rlwe_params.installation.BACKENDS", {"malb": Backend((), str(source), "0" * 40)}):
             with self.assertRaisesRegex(RuntimeError, "Git failed"):
                 install_backend("malb")
             self.assertEqual(list(self.destination.iterdir()), [])

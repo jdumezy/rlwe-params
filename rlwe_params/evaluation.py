@@ -11,7 +11,7 @@ from typing import Iterable, Optional, Union
 from .backend import EstimationError, Estimator, UnsupportedParameters
 from .parameters import Parameters
 from .results import AttackEstimate, Estimate, Evaluation
-from ._serialization import dumps
+from .protocol import canonical, encode_parameters
 
 
 def default_jobs():
@@ -31,7 +31,7 @@ def _database(cache):
     path.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(path, timeout=30)
     try:
-        connection.execute("CREATE TABLE IF NOT EXISTS attacks_v1 "
+        connection.execute("CREATE TABLE IF NOT EXISTS attacks_v2 "
                            "(key TEXT PRIMARY KEY, security_bits TEXT NOT NULL)")
         connection.commit()
         yield connection
@@ -92,15 +92,15 @@ def evaluate(parameters: Parameters, estimators: Iterable[Estimator], *,
                 refuted = True
             if key is not None and database is not None:
                 with database:
-                    database.execute("INSERT OR REPLACE INTO attacks_v1 VALUES (?, ?)",
+                    database.execute("INSERT OR REPLACE INTO attacks_v2 VALUES (?, ?)",
                                      (key, str(result.security_bits)))
 
         for index, estimator in enumerate(applicable):
             for name in estimator.attacks:
-                key = dumps((parameters, estimator.name, estimator.revision, estimator.cost_model,
-                             dict(estimator.configuration), name))
+                key = canonical([encode_parameters(parameters), estimator.name, estimator.revision,
+                                 estimator.cost_model, dict(estimator.configuration), name])
                 row = None if database is None else database.execute(
-                    "SELECT security_bits FROM attacks_v1 WHERE key = ?", (key,)).fetchone()
+                    "SELECT security_bits FROM attacks_v2 WHERE key = ?", (key,)).fetchone()
                 if row is None:
                     pending.append(((index, name), key))
                 else:

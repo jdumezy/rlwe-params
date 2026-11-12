@@ -11,15 +11,15 @@ It works for sparse, ternary, uniform, and Gaussian secrets.
 
 ## Installation
 
-The estimators need [SageMath](https://www.sagemath.org/) with SciPy and fpylll, and Git.
-`rlwe-params` itself is plain Python 3.9+ and runs the estimators in a Sage subprocess.
+`rlwe-params` is plain Python 3.9+, and runs each estimator as a separate process.
+The bundled estimators are written for [SageMath](https://www.sagemath.org/), so they need Sage with SciPy and fpylll, and Git.
 
 ```bash
 python3 -m pip install git+https://github.com/jdumezy/rlwe-params.git
 rlwe-params setup
 ```
 
-`setup` checks the Sage runtime and installs the pinned estimator sources.
+`setup` checks Sage and installs the pinned estimator sources.
 It uses `sage` on `PATH`, or `--sage PATH`.
 
 Without a local Sage, use Docker.

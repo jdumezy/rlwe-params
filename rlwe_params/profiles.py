@@ -38,9 +38,9 @@ class Profile:
 
     def estimators(self, parameters: Parameters):
         """Construct the selected backends that apply to these parameters."""
-        from .estimators import SageEstimator
+        from .estimators import ProcessEstimator
 
-        return [SageEstimator(name, attacks=self.attacks.get(name), cost_model=self.cost_model,
+        return [ProcessEstimator(name, attacks=self.attacks.get(name), cost_model=self.cost_model,
                               shape_model=self.shape_model)
                 for name in self.backends
                 if BACKENDS[name].applies is None or BACKENDS[name].applies(parameters)]

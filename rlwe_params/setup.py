@@ -6,12 +6,12 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-from .installation import BACKENDS, backend_path, install_backend
-from ._runtime import runtime_command
+from .installation import BACKENDS, backends_root, install_backend
+from ._runtime import sage_command
 
 
 def setup(backends=tuple(BACKENDS), *, sage=None):
-    """Check a Sage runtime, install pinned backend sources, and record the runtime.
+    """Check the Sage runtime, install pinned backend sources, and record the runtime.
 
     Use sage, $RLWE_PARAMS_SAGE, a recorded runtime, or sage on PATH.
     Without SageMath, use the Docker image.
@@ -19,11 +19,11 @@ def setup(backends=tuple(BACKENDS), *, sage=None):
     backends = tuple(backends)
     if not backends or set(backends) - BACKENDS.keys():
         raise ValueError(f"Choose backends from {tuple(BACKENDS)}.")
-    root = backend_path("malb").parent
+    root = backends_root()
     root.mkdir(parents=True, exist_ok=True)
-    command = runtime_command(sage or os.environ.get("RLWE_PARAMS_SAGE"))
+    command = sage_command(sage or os.environ.get("RLWE_PARAMS_SAGE"))
     subprocess.run([*command, "-python", "-c", "import sage.all, scipy, fpylll"], check=True)
-    paths = [install_backend(name) for name in backends]
+    paths = [install_backend(name) for name in backends if BACKENDS[name].url]
     configuration = root / "runtime.json"
     with tempfile.NamedTemporaryFile(mode="w", dir=root, delete=False) as stream:
         json.dump({"command": list(command)}, stream)

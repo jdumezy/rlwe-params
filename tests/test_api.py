@@ -14,8 +14,7 @@ from rlwe_params import (
     AttackEstimate, DiscreteGaussian, EstimationError, Parameters,
     SparseTernary, Ternary, UnsupportedParameters, estimate,
 )
-from rlwe_params._runtime import Worker, pool
-from rlwe_params._serialization import dumps, loads
+from rlwe_params._runtime import Worker, backend_command, pool
 from rlwe_params.cli import main
 from rlwe_params.estimators import MalbEstimator, TabOgEstimator
 
@@ -24,7 +23,7 @@ class Backend:
     name = "synthetic"
     revision = "test-revision"
     cost_model = "test-cost-model"
-    configuration = {"shapes": ("test", 1)}
+    configuration = {"shapes": ["test", 1]}
     attacks = ("finite", "infinite")
 
     def supports(self, parameters):
@@ -49,7 +48,7 @@ class ApiTests(unittest.TestCase):
             estimate(self.parameters, n=512, estimators=[Backend()])
 
     def test_default_selection_includes_sparse_attacks_and_does_not_hide_missing_backend(self):
-        with patch("rlwe_params.estimators.SageEstimator", return_value=Backend()) as adapter:
+        with patch("rlwe_params.estimators.ProcessEstimator", return_value=Backend()) as adapter:
             result = estimate(self.parameters, cache=False)
             self.assertEqual(len(result.estimates), 2)
             self.assertEqual([call.args for call in adapter.call_args_list], [("malb",), ("tabog",)])
@@ -60,20 +59,12 @@ class ApiTests(unittest.TestCase):
                 raise ValueError("missing")
             return Backend()
 
-        with patch("rlwe_params.estimators.SageEstimator", side_effect=missing):
+        with patch("rlwe_params.estimators.ProcessEstimator", side_effect=missing):
             with self.assertRaisesRegex(ValueError, "missing"):
                 estimate(self.parameters, cache=False)
             result = estimate(n=256, q=2**15, secret=Ternary(),
                               error=DiscreteGaussian("3.2"), cache=False)
             self.assertEqual(len(result.estimates), 1)
-
-    def test_wire_preserves_large_moduli_decimal_thresholds_and_configuration_types(self):
-        parameters = Parameters(4096, 1 << 20000, SparseTernary(15, 17),
-                                DiscreteGaussian("3.200000000000000000000000000000000001"), 8192)
-        result = estimate(parameters, estimators=[Backend()], cache=False).estimates[0]
-        self.assertEqual(loads(dumps(result)), result)
-        self.assertIsInstance(loads(dumps(result)).configuration["shapes"], tuple)
-        self.assertEqual(loads(dumps(result)).attacks[1].security_bits, Decimal("Infinity"))
 
     def test_cli_translates_parameters_and_prints_precise_json(self):
         result = estimate(self.parameters, estimators=[Backend()], cache=False)
@@ -93,7 +84,7 @@ class ApiTests(unittest.TestCase):
     def test_worker_death_is_reported_and_resources_are_closed(self):
         runtime = Worker((sys.executable, "-c", "raise SystemExit(3)"))
         with self.assertRaises(EstimationError):
-            runtime.request("load")
+            runtime.request({"op": "describe"})
         self.assertIsNone(runtime.process)
         self.assertIsNone(runtime.log)
 
@@ -102,7 +93,7 @@ class ApiTests(unittest.TestCase):
         runtime.lock.acquire()
         with patch("rlwe_params._runtime.os.getpid", return_value=runtime.owner + 1):
             with self.assertRaisesRegex(EstimationError, "child process"):
-                runtime.request("load")
+                runtime.request({"op": "describe"})
         runtime.lock.release()
 
 
@@ -117,15 +108,15 @@ class RuntimeIntegrationTests(unittest.TestCase):
             self.assertTrue(result.complete)
             self.assertEqual([len(e.attacks) for e in result.estimates], [7, 4])
             self.assertEqual(result, estimate(parameters, cache=False, jobs=1))
-            workers = list(pool().idle)
+            workers = list(pool(backend_command("malb")).idle)
             self.assertGreater(len(workers), 1)
             processes = [runtime.process for runtime in workers]
             original = Worker.request
 
-            def cached_only(runtime, operation, **arguments):
-                if operation == "attack":
+            def cached_only(runtime, message):
+                if message["op"] == "attack":
                     self.fail("A cached estimate reran an attack.")
-                return original(runtime, operation, **arguments)
+                return original(runtime, message)
 
             with patch.object(Worker, "request", cached_only):
                 self.assertEqual(estimate(parameters, cache=cache), result)
@@ -154,10 +145,10 @@ class RuntimeIntegrationTests(unittest.TestCase):
             refuted = estimate(parameters, cache=False, target=1000)
             self.assertFalse(result.security_bits >= 1000 or refuted.complete)
             self.assertEqual(estimate(parameters, cache=False), result)
-            for runtime in list(pool().idle):
+            for runtime in list(pool(backend_command("malb")).idle):
                 runtime.close()
             self.assertTrue(existing.supports(parameters))
-            for runtime in list(pool().idle):
+            for runtime in list(pool(backend_command("malb")).idle):
                 runtime.close()
 
 

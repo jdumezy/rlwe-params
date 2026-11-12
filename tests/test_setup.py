@@ -12,8 +12,8 @@ class SetupTests(unittest.TestCase):
     def test_setup_validates_the_runtime_before_publishing_configuration(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            with patch.object(setup_module, "backend_path", return_value=root / "malb"):
-                with patch.object(setup_module, "runtime_command", return_value=("/example/sage",)):
+            with patch.object(setup_module, "backends_root", return_value=root):
+                with patch.object(setup_module, "sage_command", return_value=("/example/sage",)):
                     with patch.object(setup_module.subprocess, "run") as run:
                         with patch.object(setup_module, "install_backend", return_value=root / "malb"):
                             self.assertEqual(setup_module.setup(["malb"], sage="/example/sage"), [root / "malb"])
@@ -21,7 +21,7 @@ class SetupTests(unittest.TestCase):
                                      {"command": ["/example/sage"]})
                     self.assertIn("import sage.all, scipy, fpylll", run.call_args.args[0])
                 (root / "runtime.json").unlink()
-                with patch.object(setup_module, "runtime_command", side_effect=RuntimeError("missing")):
+                with patch.object(setup_module, "sage_command", side_effect=RuntimeError("missing")):
                     with patch.object(setup_module, "install_backend") as install:
                         with self.assertRaisesRegex(RuntimeError, "missing"):
                             setup_module.setup()

@@ -1,4 +1,4 @@
-"""Adapter for TabOg's rotated primal-hybrid attacks."""
+"""Backend program for TabOg's rotated primal-hybrid attacks. Runs in Sage."""
 
 import builtins
 from hashlib import sha256
@@ -10,8 +10,9 @@ from types import ModuleType
 from ..backend import EstimationError, UnsupportedParameters
 from ..installation import backend_path
 from ..parameters import Parameters, SparseTernary
+from ..protocol import serve
 from ..results import AttackEstimate
-from ._malb import MalbEstimator
+from .malb import MalbAdapter
 from ._source import source_revision
 
 
@@ -52,7 +53,7 @@ def _load_rotated(source, dependency, revision):
     return module
 
 
-class TabOgEstimator:
+class TabOgAdapter:
     """Use PrimalHybrid and its lattice_estimator submodule from a TabOg checkout."""
 
     name = "TabOg/mlwe-hybrids"
@@ -66,7 +67,7 @@ class TabOgEstimator:
         if not source.is_file():
             raise ValueError("Run 'rlwe-params setup tabog', "
                              "or pass a mlwe-hybrids checkout path.")
-        self._malb = MalbEstimator(primal / "lattice_estimator", cost_model=cost_model,
+        self._malb = MalbAdapter(primal / "lattice_estimator", cost_model=cost_model,
                                   shape_model=shape_model)
         revision = source_revision({"tabog": source, "adapter": Path(__file__)}, {})
         self.revision = f"tabog={revision}|malb={self._malb.revision}"
@@ -105,3 +106,7 @@ class TabOgEstimator:
             return AttackEstimate(name, self._malb._bits(cost["rop"]))
         except Exception as exc:
             raise EstimationError(f"TabOg attack {name} failed: {exc}") from exc
+
+
+if __name__ == "__main__":
+    serve(TabOgAdapter)

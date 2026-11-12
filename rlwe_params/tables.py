@@ -133,7 +133,7 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
 
     Completed cells are written immediately and reused when their backend
     revisions match. A cell's guess extrapolates the same secret and target at
-    smaller ring dimensions, which run first. Up to jobs Sage workers run
+    smaller ring dimensions, which run first. Up to jobs backend processes run
     across cells. upper defaults to n // 16. estimators, if given, maps a
     reference Parameters to estimators instead of the profile's backends.
     progress receives (cell key, logq, costs, full) for each evaluation, and

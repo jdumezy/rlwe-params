@@ -1,5 +1,5 @@
-"""Estimator adapters."""
+"""Estimators run as backend processes."""
 
-from .sage import MalbEstimator, SageEstimator, TabOgEstimator
+from .process import MalbEstimator, ProcessEstimator, TabOgEstimator
 
-__all__ = ["MalbEstimator", "SageEstimator", "TabOgEstimator"]
+__all__ = ["MalbEstimator", "ProcessEstimator", "TabOgEstimator"]
