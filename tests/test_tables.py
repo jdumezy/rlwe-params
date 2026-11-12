@@ -4,11 +4,12 @@ import io
 import json
 from pathlib import Path
 import tempfile
-from threading import Lock
+from threading import Event, Lock
+import time
 import unittest
 from unittest.mock import patch
 
-from ckks_estimator import AttackEstimate, SparseTernary, Ternary, run_table
+from ckks_estimator import AttackEstimate, EstimationError, SparseTernary, Ternary, run_table
 from ckks_estimator.cli import main
 from ckks_estimator.tables import secret
 
@@ -133,6 +134,34 @@ class TableTests(unittest.TestCase):
                 secret(label)
         with self.assertRaisesRegex(ValueError, "at least one"):
             run_table(log_ns=[12], secrets=[], targets=[128], output=self.output)
+
+    def test_interruption_abandons_running_cells_and_starts_no_more(self):
+        started, cancelled = Event(), Event()
+        calls = []
+
+        class Blocking(Curve):
+            def attack(self, parameters, name):
+                calls.append(parameters.n)
+                started.set()
+                if not cancelled.wait(30):
+                    raise AssertionError("The running attack was not cancelled.")
+                raise EstimationError("cancelled")
+
+            def cancel(self):
+                cancelled.set()
+
+        def interrupt(*arguments, **options):
+            started.wait(30)
+            raise KeyboardInterrupt
+
+        begun = time.monotonic()
+        with patch("ckks_estimator.tables.wait", side_effect=interrupt), \
+                self.assertRaises(KeyboardInterrupt):
+            run_table(log_ns=[12, 13], secrets=["ternary"], targets=[128], output=self.output,
+                      cache=False, jobs=1, estimators=lambda reference: [Blocking(reference)])
+        self.assertTrue(cancelled.is_set())
+        self.assertLess(time.monotonic() - begun, 10)
+        self.assertEqual(calls, [4096])
 
     def test_cli_builds_the_grid(self):
         arguments = ["table", "--log-n", "12", "13", "--h", "32", "64", "--ternary",

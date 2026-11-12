@@ -3,6 +3,7 @@
 import argparse
 import json
 from pathlib import Path
+import signal
 import sqlite3
 import subprocess
 import sys
@@ -125,6 +126,10 @@ def _print_estimate(result, arguments):
         print(f"{name}: unsupported parameters")
 
 
+def _interrupt(number, frame):
+    raise KeyboardInterrupt
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="ckks-estimator")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -160,6 +165,9 @@ def main(argv=None):
     _common(table)
     _search_bounds(table, "Largest allowed logq. Default: n // 16 for each row.")
     arguments = parser.parse_args(argv)
+    # Stop cleanly on kill, and on Ctrl-C even when started in the background.
+    signal.signal(signal.SIGTERM, _interrupt)
+    signal.signal(signal.SIGINT, _interrupt)
     try:
         if arguments.command == "setup":
             from .setup import setup
@@ -210,6 +218,9 @@ def main(argv=None):
                                 secret, error, arguments.samples)
         _print_estimate(estimate(parameters, profile=selected, cache=cache, jobs=arguments.jobs),
                         arguments)
+    except KeyboardInterrupt:
+        parser.exit(130, "Interrupted. Completed table cells are saved.\n"
+                    if arguments.command == "table" else "Interrupted.\n")
     except (ValueError, TypeError, ArithmeticError, RuntimeError, OSError,
             sqlite3.Error, subprocess.SubprocessError) as exc:
         parser.exit(1, f"{exc}\n")

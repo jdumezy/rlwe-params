@@ -5,10 +5,12 @@ from decimal import Decimal
 import json
 from pathlib import Path
 import tempfile
+from threading import Event, Lock
 import time
 from typing import Callable, Optional, Sequence, Union
 
 from .api import max_logq
+from .backend import EstimationError
 from .evaluation import default_jobs
 from .parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary
 from .profiles import profile as _profile
@@ -38,6 +40,29 @@ def _guess(records, log_n, label, target):
     if previous[1] is None:
         return 2 * previous[0]
     return round(previous[0] * previous[0] / previous[1])
+
+
+class _Stoppable:
+    """An estimator that refuses new work once the table run stops."""
+
+    def __init__(self, estimator, stop):
+        self._estimator = estimator
+        self._stop = stop
+
+    def __getattr__(self, name):
+        return getattr(self._estimator, name)
+
+    def _check(self):
+        if self._stop.is_set():
+            raise EstimationError("The table run was interrupted.")
+
+    def supports(self, parameters):
+        self._check()
+        return self._estimator.supports(parameters)
+
+    def attack(self, parameters, name):
+        self._check()
+        return self._estimator.attack(parameters, name)
 
 
 def _write(path, text):
@@ -134,6 +159,7 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
             raise ValueError(f"{results} was written with other settings. Choose another output.")
         records = stored["cells"]
     factory = selected.estimators if estimators is None else estimators
+    stop, active, lock = Event(), [], Lock()
 
     def save():
         _write(results, json.dumps({"settings": settings, "cells": dict(sorted(records.items()))},
@@ -147,7 +173,9 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
         n = 1 << log_n
         cell_upper = n // 16 if upper is None else upper
         reference = Parameters(n, 2, secret(label), error, samples)
-        cell_estimators = tuple(factory(reference))
+        cell_estimators = tuple(_Stoppable(estimator, stop) for estimator in factory(reference))
+        with lock:
+            active.extend(cell_estimators)
         revisions = {estimator.name: estimator.revision for estimator in cell_estimators}
         previous = records.get(key)
         if previous is not None and previous["revisions"] == revisions:
@@ -181,33 +209,46 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
     cells = [(log_n, label, target) for log_n in log_ns for target in targets for label in labels]
     pending, running, failures = list(cells), {}, {}
     with ThreadPoolExecutor(jobs) as pool:
-        while pending or running:
-            # A cell waits for the same secret and target at the previous ring dimension.
-            ready = [cell for cell in pending
-                     if cell[0] - 1 not in log_ns or _key(cell[0] - 1, *cell[1:]) in records
-                     or _key(cell[0] - 1, *cell[1:]) in failures]
-            slots = jobs - sum(workers for _, workers in running.values())
-            for cell in ready[:max(0, slots)]:
-                workers = max(1, slots // min(slots, len(ready)))
-                guess = _guess(records, *cell)
-                running[pool.submit(run, *cell, guess, workers)] = (cell, workers)
-                pending.remove(cell)
-            if not running:
-                break
-            finished, _ = wait(running, return_when=FIRST_COMPLETED)
-            for future in finished:
-                cell, _ = running.pop(future)
-                key = _key(*cell)
-                try:
-                    records[key] = future.result()
-                except Exception as exc:
-                    failures[key] = exc
+        try:
+            while pending or running:
+                # A cell waits for the same secret and target at the previous ring dimension.
+                ready = [cell for cell in pending
+                         if cell[0] - 1 not in log_ns or _key(cell[0] - 1, *cell[1:]) in records
+                         or _key(cell[0] - 1, *cell[1:]) in failures]
+                slots = jobs - sum(workers for _, workers in running.values())
+                for cell in ready[:max(0, slots)]:
+                    workers = max(1, slots // min(slots, len(ready)))
+                    guess = _guess(records, *cell)
+                    running[pool.submit(run, *cell, guess, workers)] = (cell, workers)
+                    pending.remove(cell)
+                if not running:
+                    break
+                finished, _ = wait(running, return_when=FIRST_COMPLETED)
+                for future in finished:
+                    cell, _ = running.pop(future)
+                    key = _key(*cell)
+                    try:
+                        records[key] = future.result()
+                    except Exception as exc:
+                        failures[key] = exc
+                        if progress is not None:
+                            progress(key, exc)
+                        continue
+                    save()
                     if progress is not None:
-                        progress(key, exc)
-                    continue
-                save()
-                if progress is not None:
-                    progress(key, records[key])
+                        progress(key, records[key])
+        except BaseException:
+            # Interrupted: refuse new attacks and abandon running ones, keeping saved cells.
+            stop.set()
+            for future in running:
+                future.cancel()
+            with lock:
+                for estimator in active:
+                    cancel = getattr(estimator, "cancel", None)
+                    if cancel is not None:
+                        cancel()
+            raise
+
     for cell in pending:
         failures[_key(*cell)] = RuntimeError("A previous ring dimension failed.")
     save()
