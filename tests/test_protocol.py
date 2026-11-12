@@ -10,6 +10,8 @@ from rlwe_params import (
     AttackEstimate, DiscreteGaussian, EstimationError, Parameters, Profile, SparseTernary, Ternary,
     Uniform, UnsupportedParameters, estimate, max_logq,
 )
+from rlwe_params import _runtime
+from rlwe_params._runtime import pool, process_limit
 from rlwe_params.estimators import ProcessEstimator
 from rlwe_params.installation import BACKENDS, Backend
 from rlwe_params.protocol import decode_parameters, encode_parameters, raise_error, serve
@@ -115,6 +117,23 @@ class ToyBackendTests(unittest.TestCase):
             toy.attack(parameters, "unknown")
         profile = Profile("toy-only", backends=("toy",))
         self.assertEqual([estimator.name for estimator in profile.estimators(parameters)], ["toy"])
+
+    def test_process_limit_closes_idle_workers_of_any_backend(self):
+        commands = [(*TOY.command, label) for label in ("a", "b", "c")]
+        with patch.dict(_runtime._pools, clear=True), process_limit(2):
+            pools = [pool(command) for command in commands]
+            workers = []
+            for current in pools:
+                with current.worker() as worker:
+                    worker.request({"op": "describe", "options": {"cost_model": "MATZOV"}})
+                    workers.append(worker)
+        self.assertIsNone(_runtime._limit)
+        self.assertIsNone(workers[0].process)
+        self.assertIsNotNone(workers[2].process)
+        self.assertEqual(([len(p.idle) for p in pools], sum(p.size for p in pools)), ([0, 1, 1], 2))
+        for current in pools:
+            for worker in current.idle:
+                worker.close()
 
 
 if __name__ == "__main__":

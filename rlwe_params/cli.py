@@ -9,6 +9,8 @@ import subprocess
 import sys
 
 from .api import estimate, max_logq
+from .evaluation import default_jobs
+from ._runtime import process_limit
 from .installation import BACKENDS
 from .parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary, Uniform
 from .profiles import PROFILES, profile
@@ -165,6 +167,13 @@ def main(argv=None):
     _common(table)
     _search_bounds(table, "Largest allowed logq. Default: n // 16 for each row.")
     arguments = parser.parse_args(argv)
+    if arguments.command != "setup":
+        with process_limit(arguments.jobs or default_jobs()):
+            return _run(parser, arguments)
+    return _run(parser, arguments)
+
+
+def _run(parser, arguments):
     # Stop cleanly on kill, and on Ctrl-C even when started in the background.
     signal.signal(signal.SIGTERM, _interrupt)
     signal.signal(signal.SIGINT, _interrupt)

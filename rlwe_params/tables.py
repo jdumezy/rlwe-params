@@ -12,6 +12,7 @@ from typing import Callable, Optional, Sequence, Union
 from .api import max_logq
 from .backend import EstimationError
 from .evaluation import default_jobs
+from ._runtime import process_limit
 from .parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary
 from .profiles import profile as _profile
 
@@ -221,7 +222,7 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
 
     cells = [(log_n, label, target) for log_n in log_ns for target in targets for label in labels]
     pending, running, failures = list(cells), {}, {}
-    with ThreadPoolExecutor(jobs) as pool:
+    with process_limit(jobs), ThreadPoolExecutor(jobs) as pool:
         try:
             while pending or running:
                 # A cell waits for the same secret and target at the previous ring dimension.

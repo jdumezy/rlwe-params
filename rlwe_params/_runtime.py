@@ -130,21 +130,46 @@ class Pool:
     def __init__(self, command):
         self.command = command
         self.idle = []
-        self.lock = Lock()
+        self.size = 0
 
     @contextmanager
     def worker(self):
-        with self.lock:
-            selected = self.idle.pop() if self.idle else Worker(self.command)
+        evicted = None
+        with _lock:
+            if self.idle:
+                selected = self.idle.pop()
+            else:
+                if _limit is not None and sum(pool.size for pool in _pools.values()) >= _limit:
+                    # Make room by closing the longest idle worker of any backend.
+                    owner = next((pool for pool in _pools.values() if pool.idle), None)
+                    if owner is not None:
+                        evicted = owner.idle.pop(0)
+                        owner.size -= 1
+                selected = Worker(self.command)
+                self.size += 1
+        if evicted is not None:
+            evicted.close()
         try:
             yield selected
         finally:
-            with self.lock:
+            with _lock:
                 self.idle.append(selected)
 
 
 _pools = {}
 _lock = Lock()
+_limit = None
+
+
+@contextmanager
+def process_limit(count):
+    """Keep at most count backend processes inside this block, closing idle ones first."""
+    global _limit
+    previous, _limit = _limit, count
+    try:
+        yield
+    finally:
+        _limit = previous
 
 
 def _after_fork():
