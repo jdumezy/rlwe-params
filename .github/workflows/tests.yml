@@ -11,15 +11,14 @@ jobs:
   plain:
     name: Plain tests (Python ${{ matrix.python }})
     runs-on: ubuntu-latest
+    # Official images keep Python versions that the runners no longer provide.
+    container: python:${{ matrix.python }}
     strategy:
       fail-fast: false
       matrix:
         python: ["3.9", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
+      - uses: actions/checkout@v5
       - run: python -m unittest discover -s tests -v
 
   backends:
@@ -28,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: docker build -t rlwe-params .
       - run: >
           docker run --rm -v "$PWD:/src:ro" -w /src

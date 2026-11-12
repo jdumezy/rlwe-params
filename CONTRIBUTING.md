@@ -46,11 +46,11 @@ A backend answers three requests, each carrying the `options` it was configured 
 ```
 
 Errors are `{"error": {"kind": "unsupported" | "invalid" | "failed", "message": ...}}`.
-Costs are log2 values as decimal strings, rounded down, or `"Infinity"`.
+`q` is a hexadecimal string. Costs are log2 values as decimal strings, rounded down, or `"Infinity"`.
 Parameters look like this.
 
 ```json
-{"n": 4096, "q": "1267650600228229401496703205376", "samples": null,
+{"n": 4096, "q": "0x10000000000000000000000000", "samples": null,
  "secret": {"type": "sparse_ternary", "positive": 32, "negative": 32},
  "error": {"type": "discrete_gaussian", "stddev": "3.2"}}
 ```

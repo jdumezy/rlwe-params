@@ -21,7 +21,7 @@ def answer(request):
     if request["op"] == "attack":
         if request["attack"] not in ("primal", "dual"):
             raise KeyError(request["attack"])
-        bits = 3.5 * parameters["n"] / math.log2(int(parameters["q"]))
+        bits = 3.5 * parameters["n"] / math.log2(int(parameters["q"], 16))
         return f"{math.floor((bits + (5 if request['attack'] == 'dual' else 0)) * 1e6) / 1e6:.6f}"
     raise KeyError(request["op"])
 

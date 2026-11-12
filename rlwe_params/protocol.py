@@ -11,8 +11,9 @@ and responses are {"result": ...} or {"error": {"kind": ..., "message": ...}},
 where kind is "unsupported", "invalid", or "failed". describe returns name,
 revision, cost_model, configuration, and attacks. supports returns a boolean.
 attack returns the log2 cost as a decimal string, rounded down, or "Infinity".
-Parameters encode n and samples as integers, q as a decimal string, and each
-distribution as an object with a "type" field.
+Parameters encode n and samples as integers, q as a hexadecimal string such as
+"0x10000", which avoids digit limits on very large moduli, and each distribution as
+an object with a "type" field.
 """
 
 from contextlib import redirect_stdout
@@ -60,13 +61,13 @@ def decode_distribution(data: dict):
 
 
 def encode_parameters(parameters: Parameters) -> dict:
-    return {"n": parameters.n, "q": str(parameters.q),
+    return {"n": parameters.n, "q": hex(parameters.q),
             "secret": encode_distribution(parameters.secret),
             "error": encode_distribution(parameters.error), "samples": parameters.samples}
 
 
 def decode_parameters(data: dict) -> Parameters:
-    return Parameters(data["n"], int(data["q"]), decode_distribution(data["secret"]),
+    return Parameters(data["n"], int(data["q"], 16), decode_distribution(data["secret"]),
                       decode_distribution(data["error"]), data["samples"])
 
 

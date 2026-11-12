@@ -51,7 +51,7 @@ class ProtocolTests(unittest.TestCase):
             parameters = Parameters(4096, (1 << 20000) + 1, secret, DiscreteGaussian("3.19"), 8192)
             encoded = json.loads(json.dumps(encode_parameters(parameters)))
             self.assertEqual(decode_parameters(encoded), parameters)
-            self.assertIsInstance(encoded["q"], str)
+            self.assertTrue(encoded["q"].startswith("0x"))
         self.assertIsNone(encode_parameters(Parameters(16, 17, Ternary(), Ternary()))["samples"])
         with self.assertRaisesRegex(ValueError, "Unknown distribution"):
             decode_parameters({**encoded, "secret": {"type": "binary"}})
