@@ -25,7 +25,7 @@ def _database(cache):
         return
     if cache is True:
         root = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache"))
-        path = root / "ckks-estimator" / "estimates.sqlite3"
+        path = root / "rlwe-params" / "estimates.sqlite3"
     else:
         path = Path(cache)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -48,15 +48,16 @@ def _run(estimator, parameters, name):
 
 def evaluate(parameters: Parameters, estimators: Iterable[Estimator], *,
              cache: Union[bool, str, Path] = True, jobs: Optional[int] = None,
-             target=None) -> Evaluation:
+             target=None, order=()) -> Evaluation:
     """Evaluate the selected attacks of applicable backends with a common cost model.
 
-    cache=True uses $XDG_CACHE_HOME/ckks-estimator/estimates.sqlite3,
+    cache=True uses $XDG_CACHE_HOME/rlwe-params/estimates.sqlite3,
     falling back to ~/.cache. A path selects another database.
     cache=False disables both cache reads and writes.
 
     jobs attacks run in parallel. Default: at most 4. With a target, stop at
-    the first attack below it and return an incomplete Evaluation.
+    the first attack below it and return an incomplete Evaluation. Uncached
+    attacks named in order, as (estimator name, attack) pairs, start first.
     """
     jobs = default_jobs() if jobs is None else jobs
     if type(jobs) is not int or jobs < 1:
@@ -107,6 +108,8 @@ def evaluate(parameters: Parameters, estimators: Iterable[Estimator], *,
 
         if refuted:
             pending = []
+        rank = {pair: index for index, pair in enumerate(order)}
+        pending.sort(key=lambda item: rank.get((applicable[item[0][0]].name, item[0][1]), len(rank)))
         if jobs == 1 or len(pending) < 2:
             for task, key in pending:
                 record(task, _run(applicable[task[0]], parameters, task[1]), key)

@@ -8,11 +8,11 @@ from types import ModuleType
 import unittest
 from unittest.mock import patch
 
-from ckks_estimator import (
+from rlwe_params import (
     DiscreteGaussian, EstimationError, Parameters, SparseTernary, Ternary,
     UnsupportedParameters,
 )
-from ckks_estimator.estimators._tabog import TabOgEstimator
+from rlwe_params.estimators._tabog import TabOgEstimator
 
 
 TABOG_PATH = os.environ.get("TABOG_ESTIMATOR_PATH")

@@ -36,14 +36,14 @@ BACKENDS = {
         "https://github.com/malb/lattice-estimator.git",
         "6019056011d10d7e9c30a0d5da2d2f729fbc2eec",
         source="estimator/__init__.py",
-        adapter="ckks_estimator.estimators._malb:MalbEstimator",
+        adapter="rlwe_params.estimators._malb:MalbEstimator",
     ),
     "tabog": Backend(
         "https://github.com/TabOg/mlwe-hybrids.git",
         "a92f335665eef69927d2d8f49832bd595a6dac32",
         ("PrimalHybrid/lattice_estimator",),
         source="PrimalHybrid/lwe_rot_primal.py",
-        adapter="ckks_estimator.estimators._tabog:TabOgEstimator",
+        adapter="rlwe_params.estimators._tabog:TabOgEstimator",
         applies=_sparse_power_of_two,
     ),
 }
@@ -55,7 +55,7 @@ def backend_path(name: str, directory=None) -> Path:
         raise ValueError(f"Unknown backend {name!r}. Choose from {tuple(BACKENDS)}.")
     if directory is None:
         root = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
-        directory = os.environ.get("CKKS_ESTIMATOR_BACKENDS", root / "ckks-estimator" / "backends")
+        directory = os.environ.get("RLWE_PARAMS_BACKENDS", root / "rlwe-params" / "backends")
     return Path(directory).expanduser().resolve() / f"{name}-{BACKENDS[name].revision}"
 
 

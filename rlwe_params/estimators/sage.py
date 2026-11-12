@@ -18,7 +18,7 @@ class SageEstimator:
                  shape_model="GSA", sage=None):
         path = backend_path(backend) if path is None else Path(path).resolve()
         if not (path / BACKENDS[backend].source).is_file():
-            raise ValueError(f"Missing {backend} sources. Run 'ckks-estimator setup {backend}' "
+            raise ValueError(f"Missing {backend} sources. Run 'rlwe-params setup {backend}' "
                              "or pass a checkout path.")
         self.backend = backend
         self._pool = pool(sage)

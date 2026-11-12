@@ -4,8 +4,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from ckks_estimator.estimators import MalbEstimator, TabOgEstimator
-from ckks_estimator.installation import Backend, backend_path, install_backend
+from rlwe_params.estimators import MalbEstimator, TabOgEstimator
+from rlwe_params.installation import Backend, backend_path, install_backend
 
 
 def git(path, *arguments):
@@ -21,7 +21,7 @@ class InstallationTests(unittest.TestCase):
         self.root = Path(directory.name)
         self.destination = self.root / "installed"
         environment = patch.dict("os.environ", {
-            "CKKS_ESTIMATOR_BACKENDS": str(self.destination),
+            "RLWE_PARAMS_BACKENDS": str(self.destination),
             "GIT_ALLOW_PROTOCOL": "file",
             "GIT_CONFIG_NOSYSTEM": "1",
             "GIT_CONFIG_GLOBAL": "/dev/null",
@@ -47,7 +47,7 @@ class InstallationTests(unittest.TestCase):
         (source / "later.py").write_text("# Later revision.\n")
         git(source, "add", ".")
         git(source, "commit", "--quiet", "-m", "Later source")
-        with patch("ckks_estimator.installation.BACKENDS", {"malb": Backend(str(source), revision)}):
+        with patch("rlwe_params.installation.BACKENDS", {"malb": Backend(str(source), revision)}):
             installed = install_backend("malb")
             self.assertEqual(installed, backend_path("malb"))
             self.assertEqual(git(installed, "rev-parse", "HEAD"), revision)
@@ -73,7 +73,7 @@ class InstallationTests(unittest.TestCase):
         (dependency / "later.py").write_text("# New dependency.\n")
         git(dependency, "add", ".")
         git(dependency, "commit", "--quiet", "-m", "Advance dependency")
-        with patch("ckks_estimator.installation.BACKENDS",
+        with patch("rlwe_params.installation.BACKENDS",
                    {"tabog": Backend(str(source), revision, (submodule,))}):
             installed = install_backend("tabog")
             self.assertEqual(git(installed / submodule, "rev-parse", "HEAD"), dependency_revision)
@@ -85,12 +85,12 @@ class InstallationTests(unittest.TestCase):
 
     def test_failed_download_is_not_published_and_adapters_do_not_install(self):
         source, _ = self.repository("malb", "estimator/__init__.py")
-        with patch("ckks_estimator.installation.BACKENDS", {"malb": Backend(str(source), "0" * 40)}):
+        with patch("rlwe_params.installation.BACKENDS", {"malb": Backend(str(source), "0" * 40)}):
             with self.assertRaisesRegex(RuntimeError, "Git failed"):
                 install_backend("malb")
             self.assertEqual(list(self.destination.iterdir()), [])
         for adapter in (MalbEstimator, TabOgEstimator):
-            with self.assertRaisesRegex(ValueError, "ckks-estimator setup"):
+            with self.assertRaisesRegex(ValueError, "rlwe-params setup"):
                 adapter()
         self.assertEqual(list(self.destination.iterdir()), [])
 

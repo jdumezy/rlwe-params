@@ -3,13 +3,13 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ckks-estimator"
+name = "rlwe-params"
 version = "0.1.0"
-description = "Backend-independent security estimation for CKKS parameters."
+description = "Certified RLWE parameter selection and tables, using lattice estimators as backends."
 requires-python = ">=3.9"
 
 [project.scripts]
-ckks-estimator = "ckks_estimator.cli:main"
+rlwe-params = "rlwe_params.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["ckks_estimator*"]
+include = ["rlwe_params*"]

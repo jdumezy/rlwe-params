@@ -10,8 +10,8 @@ import traceback
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ckks_estimator.installation import BACKENDS
-from ckks_estimator._serialization import dumps, loads
+from rlwe_params.installation import BACKENDS
+from rlwe_params._serialization import dumps, loads
 
 
 def main():

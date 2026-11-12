@@ -7,14 +7,14 @@ RUN apt-get update \
     && mkdir /work && chown sage:sage /work
 
 USER sage
-WORKDIR /home/sage/ckks-estimator
+WORKDIR /home/sage/rlwe-params
 COPY --chown=sage:sage pyproject.toml ./
-COPY --chown=sage:sage ckks_estimator ./ckks_estimator
-ENV CKKS_ESTIMATOR_BACKENDS=/home/sage/backends
+COPY --chown=sage:sage rlwe_params ./rlwe_params
+ENV RLWE_PARAMS_BACKENDS=/home/sage/backends
 RUN sage -python -m pip install --no-deps --no-build-isolation . \
-    && sage -python -m ckks_estimator setup \
-    && sage -python -c "from ckks_estimator.estimators import MalbEstimator, TabOgEstimator; MalbEstimator(); TabOgEstimator()"
+    && sage -python -m rlwe_params setup \
+    && sage -python -c "from rlwe_params.estimators import MalbEstimator, TabOgEstimator; MalbEstimator(); TabOgEstimator()"
 
 WORKDIR /work
-ENTRYPOINT ["sage", "-python", "-m", "ckks_estimator"]
+ENTRYPOINT ["sage", "-python", "-m", "rlwe_params"]
 CMD ["--help"]

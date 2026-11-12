@@ -24,7 +24,7 @@ ATTACKS = {
 
 
 def _load_rotated(source, dependency, revision):
-    name = "_ckks_tabog_" + sha256(revision.encode()).hexdigest()
+    name = "_rlwe_tabog_" + sha256(revision.encode()).hexdigest()
     if name in sys.modules:
         return sys.modules[name]
     package = ModuleType("lattice_estimator")
@@ -64,7 +64,7 @@ class TabOgEstimator:
         primal = (backend_path("tabog") if path is None else Path(path).resolve()) / "PrimalHybrid"
         source = primal / "lwe_rot_primal.py"
         if not source.is_file():
-            raise ValueError("Run 'ckks-estimator setup tabog', "
+            raise ValueError("Run 'rlwe-params setup tabog', "
                              "or pass a mlwe-hybrids checkout path.")
         self._malb = MalbEstimator(primal / "lattice_estimator", cost_model=cost_model,
                                   shape_model=shape_model)

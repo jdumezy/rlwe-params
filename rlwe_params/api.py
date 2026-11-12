@@ -44,7 +44,7 @@ class _Selection:
 
 def max_logq(*, n, secret, error, upper, samples=None, target=128, lower=15,
              guess=None, window=2, profile="matzov", estimators=None, cache=True, jobs=None,
-             progress=None):
+             progress=None, prior=()):
     """Search q=2**logq with search_logq(), returning a certified SearchResult.
 
     Use the same distributions, sample count, and backends at every point.
@@ -52,6 +52,11 @@ def max_logq(*, n, secret, error, upper, samples=None, target=128, lower=15,
     runs at the returned logq. Without a guess, start from a rough estimate
     for ternary secrets. progress, if given, receives each evaluated logq, its
     attack costs, and whether every attack was requested.
+
+    Full evaluations start with the attacks cheapest at the nearest evaluated
+    logq, so that a point below the target is refuted early. Attacks not yet
+    evaluated follow, in the order of prior, a sequence of "estimator / attack"
+    labels, such as the ranking from a similar search.
     """
     jobs = default_jobs() if jobs is None else jobs
     reference = Parameters(n, 2, secret, error, samples)
@@ -64,6 +69,19 @@ def max_logq(*, n, secret, error, upper, samples=None, target=128, lower=15,
         except ArithmeticError:
             pass
 
+    pairs = {f"{estimator.name} / {attack}": (estimator.name, attack)
+             for estimator in estimators for attack in estimator.attacks}
+    position = {label: index for index, label in enumerate(prior)}
+    seen = {}
+
+    def ranking(point):
+        def key(label):
+            nearest = min(seen.get(label, {}).items(), key=lambda item: abs(item[0] - point),
+                          default=None)
+            return (0, nearest[1], 0) if nearest else (1, 0, position.get(label, len(position)))
+
+        return [pairs[label] for label in sorted(pairs, key=key)]
+
     def run(request, workers):
         point, attacks = request
         selected = estimators if attacks is None else [
@@ -71,9 +89,12 @@ def max_logq(*, n, secret, error, upper, samples=None, target=128, lower=15,
             for names in [tuple(a for a in estimator.attacks if f"{estimator.name} / {a}" in attacks)]
             if names]
         evaluation = evaluate(replace(reference, q=1 << point), selected, cache=cache, jobs=workers,
-                              target=target if attacks is None else None)
+                              target=target if attacks is None else None,
+                              order=ranking(point) if attacks is None else ())
         costs = {f"{result.estimator} / {attack.attack}": attack.security_bits
                  for result in evaluation.estimates for attack in result.attacks}
+        for label, bits in costs.items():
+            seen.setdefault(label, {})[point] = bits
         if progress is not None:
             progress(point, costs, attacks is None)
         return costs

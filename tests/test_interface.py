@@ -1,7 +1,7 @@
 from decimal import Decimal
 import unittest
 
-from ckks_estimator import (
+from rlwe_params import (
     AttackEstimate, DiscreteGaussian, Estimate, Estimator,
     Parameters, SparseTernary, Ternary, Uniform, UnsupportedParameters,
 )

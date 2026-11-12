@@ -7,12 +7,12 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
-from ckks_estimator import (
+from rlwe_params import (
     DiscreteGaussian, EstimationError, Parameters, SparseTernary, Ternary,
     Uniform, UnsupportedParameters,
 )
-from ckks_estimator.estimators._malb import ATTACKS, DEFAULT_ATTACKS, MalbEstimator
-from ckks_estimator.estimators._source import source_revision
+from rlwe_params.estimators._malb import ATTACKS, DEFAULT_ATTACKS, MalbEstimator
+from rlwe_params.estimators._source import source_revision
 
 
 class SourceTests(unittest.TestCase):
@@ -72,12 +72,16 @@ class MalbTests(unittest.TestCase):
         parameters = self.parameters()
         result = [self.backend.attack(parameters, name) for name in self.backend.attacks]
         module = self.backend._module
+        native = module.LWE.Parameters(n=128, q=3329, Xs=module.ND.Uniform(-1, 1),
+                                       Xe=module.ND.DiscreteGaussian("3.2"))
         direct = module.LWE.estimate(
-            module.LWE.Parameters(n=128, q=3329, Xs=module.ND.Uniform(-1, 1),
-                                  Xe=module.ND.DiscreteGaussian("3.2")),
-            red_cost_model=module.RC.MATZOV, red_shape_model=module.Simulator.GSA,
+            native, red_cost_model=module.RC.MATZOV, red_shape_model=module.Simulator.GSA,
             catch_exceptions=False, quiet=True,
         )
+        # malb's estimate omits the dual MitM hybrid, which its dual module provides.
+        direct["dual_mitm_hybrid"] = module.lwe_dual.dual_hybrid(
+            native, red_cost_model=module.RC.MATZOV, mitm_optimization=True)
+        self.assertIs(module.LWE.dual_hybrid, module.lwe_dual.matzov)
         self.assertEqual({attack.attack for attack in result}, set(direct))
         self.assertEqual(MalbEstimator(MALB_PATH).attacks, DEFAULT_ATTACKS)
         self.assertEqual(set(ATTACKS) - set(DEFAULT_ATTACKS), {"arora-gb", "bkw"})

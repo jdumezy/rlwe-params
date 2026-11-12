@@ -7,10 +7,10 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from ckks_estimator import (
+from rlwe_params import (
     AttackEstimate, DiscreteGaussian, EstimationError, SparseTernary, max_logq, search_logq,
 )
-from ckks_estimator.cli import main
+from rlwe_params.cli import main
 
 
 def hyperbola(scale):
@@ -180,6 +180,20 @@ class MaxLogqTests(unittest.TestCase):
                                           **self.options), result)
                 self.assertEqual(repeated.calls, [])
 
+    def test_full_evaluations_start_with_the_cheapest_known_attack(self):
+        backend = Backend("first", {"slow": lambda point: 300, "binding": hyperbola(14000)})
+        result = max_logq(estimators=[backend], cache=False, jobs=1, guess=120,
+                          prior=("first / binding",), **self.options)
+        self.assertEqual(result.logq, 109)
+        self.assertEqual(backend.calls[0], (120, "binding"))
+        self.assertEqual([point for point, name in backend.calls if name == "slow"], [109])
+        unranked = Backend("first", backend.curves)
+        max_logq(estimators=[unranked], cache=False, jobs=1, guess=120, **self.options)
+        self.assertEqual(unranked.calls[:2], [(120, "slow"), (120, "binding")])
+        # After the first evaluation, its costs rank the attacks without a prior.
+        self.assertEqual([point for point, name in unranked.calls if name == "slow"], [120, 109])
+        self.assertLess(unranked.calls.index((109, "binding")), unranked.calls.index((109, "slow")))
+
     def test_backend_failures_and_duplicate_names_propagate(self):
         backend = Backend("first", {"binding": hyperbola(14000)})
         with patch.object(backend, "attack", side_effect=EstimationError("attack failed")):
@@ -194,7 +208,7 @@ class MaxLogqTests(unittest.TestCase):
         arguments = ["search", "--log-n", "12", "--h", "32", "--sigma", "3.2",
                      "--upper", "2000", "--target", "128", "--guess", "100", "--no-cache"]
         output = io.StringIO()
-        with patch("ckks_estimator.cli.max_logq", return_value=result) as call, redirect_stdout(output):
+        with patch("rlwe_params.cli.max_logq", return_value=result) as call, redirect_stdout(output):
             main([*arguments, "--json"])
         self.assertEqual((call.call_args.kwargs["n"], call.call_args.kwargs["guess"]), (4096, 100))
         self.assertFalse(call.call_args.kwargs["cache"])
@@ -204,7 +218,7 @@ class MaxLogqTests(unittest.TestCase):
         self.assertEqual(document["costs"]["109"], {"first / binding": str(result.security_bits)})
         output, errors = io.StringIO(), io.StringIO()
         real = max_logq
-        with patch("ckks_estimator.cli.max_logq",
+        with patch("rlwe_params.cli.max_logq",
                    side_effect=lambda **options: real(**{**options, "estimators": [backend]})):
             with redirect_stdout(output), redirect_stderr(errors):
                 main([*arguments, "--details", "--progress"])

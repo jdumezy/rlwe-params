@@ -9,9 +9,9 @@ import time
 import unittest
 from unittest.mock import patch
 
-from ckks_estimator import AttackEstimate, EstimationError, SparseTernary, Ternary, run_table
-from ckks_estimator.cli import main
-from ckks_estimator.tables import secret
+from rlwe_params import AttackEstimate, EstimationError, SparseTernary, Ternary, run_table
+from rlwe_params.cli import main
+from rlwe_params.tables import _prior, secret
 
 
 class Curve:
@@ -155,7 +155,7 @@ class TableTests(unittest.TestCase):
             raise KeyboardInterrupt
 
         begun = time.monotonic()
-        with patch("ckks_estimator.tables.wait", side_effect=interrupt), \
+        with patch("rlwe_params.tables.wait", side_effect=interrupt), \
                 self.assertRaises(KeyboardInterrupt):
             run_table(log_ns=[12, 13], secrets=["ternary"], targets=[128], output=self.output,
                       cache=False, jobs=1, estimators=lambda reference: [Blocking(reference)])
@@ -163,12 +163,23 @@ class TableTests(unittest.TestCase):
         self.assertLess(time.monotonic() - begun, 10)
         self.assertEqual(calls, [4096])
 
+    def test_prior_ranks_attacks_from_the_nearest_cell_with_the_same_secret(self):
+        records = {
+            "12:64:128": {"log_n": 12, "secret": 64, "target": 128, "costs": {"a": "130", "b": "129"}},
+            "13:64:192": {"log_n": 13, "secret": 64, "target": 192, "costs": {"a": "193", "b": "199"}},
+            "13:ternary:128": {"log_n": 13, "secret": "ternary", "target": 128, "costs": {"c": "128"}},
+            "12:32:128": {"log_n": 12, "secret": 32, "target": 128, "costs": {}},
+        }
+        self.assertEqual(_prior(records, 13, 64, 128), ("a", "b"))
+        self.assertEqual(_prior(records, 12, 64, 128), ("b", "a"))
+        self.assertEqual(_prior(records, 14, 32, 128), ())
+
     def test_cli_builds_the_grid(self):
         arguments = ["table", "--log-n", "12", "13", "--h", "32", "64", "--ternary",
                      "--target", "128", "192", "--output", str(self.output), "--no-cache",
                      "--jobs", "2", "--backend", "malb"]
         output = io.StringIO()
-        with patch("ckks_estimator.tables.run_table", return_value=({}, {})) as call, \
+        with patch("rlwe_params.tables.run_table", return_value=({}, {})) as call, \
                 redirect_stdout(output):
             main(arguments)
         options = call.call_args.kwargs
@@ -176,7 +187,7 @@ class TableTests(unittest.TestCase):
                          ([12, 13], [32, 64, "ternary"], [128, 192]))
         self.assertEqual((options["sigma"], options["jobs"], options["cache"]), ("3.2", 2, False))
         self.assertEqual(options["profile"].backends, ("malb",))
-        with patch("ckks_estimator.tables.run_table", return_value=({}, {"12:32:128": RuntimeError("x")})):
+        with patch("rlwe_params.tables.run_table", return_value=({}, {"12:32:128": RuntimeError("x")})):
             with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()) as errors, \
                     self.assertRaises(SystemExit) as failure:
                 main(arguments)

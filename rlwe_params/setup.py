@@ -13,7 +13,7 @@ from ._runtime import runtime_command
 def setup(backends=tuple(BACKENDS), *, sage=None):
     """Check a Sage runtime, install pinned backend sources, and record the runtime.
 
-    Use sage, $CKKS_ESTIMATOR_SAGE, a recorded runtime, or sage on PATH.
+    Use sage, $RLWE_PARAMS_SAGE, a recorded runtime, or sage on PATH.
     Without SageMath, use the Docker image.
     """
     backends = tuple(backends)
@@ -21,7 +21,7 @@ def setup(backends=tuple(BACKENDS), *, sage=None):
         raise ValueError(f"Choose backends from {tuple(BACKENDS)}.")
     root = backend_path("malb").parent
     root.mkdir(parents=True, exist_ok=True)
-    command = runtime_command(sage or os.environ.get("CKKS_ESTIMATOR_SAGE"))
+    command = runtime_command(sage or os.environ.get("RLWE_PARAMS_SAGE"))
     subprocess.run([*command, "-python", "-c", "import sage.all, scipy, fpylll"], check=True)
     paths = [install_backend(name) for name in backends]
     configuration = root / "runtime.json"

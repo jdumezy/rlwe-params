@@ -1,4 +1,4 @@
-"""Backend-independent descriptions of CKKS security parameters."""
+"""Backend-independent descriptions of RLWE security parameters."""
 
 from dataclasses import dataclass
 from decimal import Decimal
@@ -69,7 +69,7 @@ Distribution = Union[SparseTernary, Ternary, Uniform, DiscreteGaussian]
 
 @dataclass(frozen=True)
 class Parameters:
-    """CKKS security instance with ring degree n and exact attacked modulus q."""
+    """RLWE security instance with ring degree n and exact attacked modulus q."""
 
     n: int
     q: int

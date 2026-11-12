@@ -1,7 +1,7 @@
 *
 !Dockerfile
 !pyproject.toml
-!ckks_estimator/
-!ckks_estimator/**
+!rlwe_params/
+!rlwe_params/**
 **/__pycache__/
 **/*.py[cod]

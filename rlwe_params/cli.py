@@ -131,13 +131,13 @@ def _interrupt(number, frame):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="ckks-estimator")
+    parser = argparse.ArgumentParser(prog="rlwe-params")
     commands = parser.add_subparsers(dest="command", required=True)
     setup_parser = commands.add_parser("setup", help="Install backend sources for a Sage runtime.")
     setup_parser.add_argument("backends", nargs="*", metavar="BACKEND", default=list(BACKENDS))
     setup_parser.add_argument("--sage", help="Use this Sage executable. Default: sage on PATH.")
 
-    query = commands.add_parser("estimate", help="Estimate security for CKKS parameters.")
+    query = commands.add_parser("estimate", help="Estimate security for RLWE parameters.")
     _parameters(query)
     modulus = query.add_mutually_exclusive_group(required=True)
     modulus.add_argument("--q", type=_integer, help="Exact modulus, decimal or hexadecimal.")

@@ -10,14 +10,14 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from ckks_estimator import (
+from rlwe_params import (
     AttackEstimate, DiscreteGaussian, EstimationError, Parameters,
     SparseTernary, Ternary, UnsupportedParameters, estimate,
 )
-from ckks_estimator._runtime import Worker, pool
-from ckks_estimator._serialization import dumps, loads
-from ckks_estimator.cli import main
-from ckks_estimator.estimators import MalbEstimator, TabOgEstimator
+from rlwe_params._runtime import Worker, pool
+from rlwe_params._serialization import dumps, loads
+from rlwe_params.cli import main
+from rlwe_params.estimators import MalbEstimator, TabOgEstimator
 
 
 class Backend:
@@ -49,7 +49,7 @@ class ApiTests(unittest.TestCase):
             estimate(self.parameters, n=512, estimators=[Backend()])
 
     def test_default_selection_includes_sparse_attacks_and_does_not_hide_missing_backend(self):
-        with patch("ckks_estimator.estimators.SageEstimator", return_value=Backend()) as adapter:
+        with patch("rlwe_params.estimators.SageEstimator", return_value=Backend()) as adapter:
             result = estimate(self.parameters, cache=False)
             self.assertEqual(len(result.estimates), 2)
             self.assertEqual([call.args for call in adapter.call_args_list], [("malb",), ("tabog",)])
@@ -60,7 +60,7 @@ class ApiTests(unittest.TestCase):
                 raise ValueError("missing")
             return Backend()
 
-        with patch("ckks_estimator.estimators.SageEstimator", side_effect=missing):
+        with patch("rlwe_params.estimators.SageEstimator", side_effect=missing):
             with self.assertRaisesRegex(ValueError, "missing"):
                 estimate(self.parameters, cache=False)
             result = estimate(n=256, q=2**15, secret=Ternary(),
@@ -78,7 +78,7 @@ class ApiTests(unittest.TestCase):
     def test_cli_translates_parameters_and_prints_precise_json(self):
         result = estimate(self.parameters, estimators=[Backend()], cache=False)
         output = io.StringIO()
-        with patch("ckks_estimator.cli.estimate", return_value=result) as call, redirect_stdout(output):
+        with patch("rlwe_params.cli.estimate", return_value=result) as call, redirect_stdout(output):
             main(["estimate", "--log-n", "8", "--log-q", "15", "--h", "16",
                   "--sigma", "3.2", "--samples", "512", "--no-cache", "--json"])
         supplied = call.call_args.args[0]
@@ -100,13 +100,13 @@ class ApiTests(unittest.TestCase):
     def test_inherited_worker_is_rejected_before_acquiring_its_lock(self):
         runtime = Worker((sys.executable,))
         runtime.lock.acquire()
-        with patch("ckks_estimator._runtime.os.getpid", return_value=runtime.owner + 1):
+        with patch("rlwe_params._runtime.os.getpid", return_value=runtime.owner + 1):
             with self.assertRaisesRegex(EstimationError, "child process"):
                 runtime.request("load")
         runtime.lock.release()
 
 
-@unittest.skipUnless(os.environ.get("CKKS_ESTIMATOR_TEST_SAGE"), "Requires installed backend test runtime.")
+@unittest.skipUnless(os.environ.get("RLWE_PARAMS_TEST_SAGE"), "Requires installed backend test runtime.")
 class RuntimeIntegrationTests(unittest.TestCase):
     def test_ordinary_python_api_cli_cache_and_worker_reuse(self):
         self.assertNotIn("sage.all", sys.modules)
@@ -115,7 +115,7 @@ class RuntimeIntegrationTests(unittest.TestCase):
             cache = Path(directory) / "estimates.sqlite3"
             result = estimate(parameters, cache=cache)
             self.assertTrue(result.complete)
-            self.assertEqual([len(e.attacks) for e in result.estimates], [6, 4])
+            self.assertEqual([len(e.attacks) for e in result.estimates], [7, 4])
             self.assertEqual(result, estimate(parameters, cache=False, jobs=1))
             workers = list(pool().idle)
             self.assertGreater(len(workers), 1)
@@ -130,7 +130,7 @@ class RuntimeIntegrationTests(unittest.TestCase):
             with patch.object(Worker, "request", cached_only):
                 self.assertEqual(estimate(parameters, cache=cache), result)
             self.assertEqual([runtime.process for runtime in workers], processes)
-            command = [sys.executable, "-m", "ckks_estimator", "estimate", "--log-n", "8",
+            command = [sys.executable, "-m", "rlwe_params", "estimate", "--log-n", "8",
                        "--log-q", "15", "--h", "16", "--sigma", "3.2",
                        "--cache", str(cache), "--json"]
             output = subprocess.run(command, check=True, capture_output=True, text=True)

@@ -13,9 +13,10 @@ from ..results import AttackEstimate
 from ._source import source_revision
 
 
+# dual_hybrid is the MATZOV dual attack, which malb exposes under that name.
 ATTACKS = ("arora-gb", "bkw", "usvp", "bdd", "bdd_hybrid", "bdd_mitm_hybrid",
-           "dual", "dual_hybrid")
-# arora-gb and bkw are far slower and far costlier than the lattice attacks at CKKS sizes.
+           "dual", "dual_hybrid", "dual_mitm_hybrid")
+# arora-gb and bkw are far slower and far costlier than the lattice attacks at FHE sizes.
 DEFAULT_ATTACKS = tuple(name for name in ATTACKS if name not in ("arora-gb", "bkw"))
 
 
@@ -33,7 +34,7 @@ class MalbEstimator:
             raise ValueError(f"Select distinct attacks from {ATTACKS}.")
         source = (backend_path("malb") if path is None else Path(path).resolve()) / "estimator"
         if not (source / "__init__.py").is_file():
-            raise ValueError("Run 'ckks-estimator setup malb', "
+            raise ValueError("Run 'rlwe-params setup malb', "
                              "or pass a lattice-estimator checkout path.")
 
         from sage.all import RR, oo
@@ -46,7 +47,7 @@ class MalbEstimator:
             {"malb": source, "adapter": Path(__file__)},
             {"sage": sage_version, "scipy": scipy.__version__, "fpylll": fpylll.__version__},
         )
-        module_name = "_ckks_malb_" + self.revision.split(":", 1)[1]
+        module_name = "_rlwe_malb_" + self.revision.split(":", 1)[1]
         if module_name not in sys.modules:
             spec = importlib.util.spec_from_file_location(module_name, source / "__init__.py")
             module = importlib.util.module_from_spec(spec)
@@ -112,6 +113,8 @@ class MalbEstimator:
             "bdd_mitm_hybrid": partial(lwe.primal_hybrid, mitm=True, babai=True, **primal),
             "dual": partial(lwe.dual, **reduction),
             "dual_hybrid": partial(lwe.dual_hybrid, **reduction),
+            "dual_mitm_hybrid": partial(self._module.lwe_dual.dual_hybrid, mitm_optimization=True,
+                                        **reduction),
         }
 
     def _bits(self, rop):

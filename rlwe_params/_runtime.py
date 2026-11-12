@@ -17,7 +17,7 @@ from ._serialization import dumps, loads
 
 
 def runtime_command(sage=None):
-    executable = sage or os.environ.get("CKKS_ESTIMATOR_SAGE")
+    executable = sage or os.environ.get("RLWE_PARAMS_SAGE")
     if executable:
         resolved = shutil.which(str(executable))
         if not resolved:

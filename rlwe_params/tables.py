@@ -65,6 +65,18 @@ class _Stoppable:
         return self._estimator.attack(parameters, name)
 
 
+def _prior(records, log_n, label, target):
+    """Rank attacks by their certified costs in the nearest completed cell with this secret."""
+    candidates = [record for record in records.values()
+                  if record["secret"] == label and record["costs"]]
+    if not candidates:
+        return ()
+    nearest = min(candidates, key=lambda record: (abs(record["log_n"] - log_n),
+                                                  abs(record["target"] - target)))
+    costs = nearest["costs"]
+    return tuple(sorted(costs, key=lambda attack: Decimal(costs[attack])))
+
+
 def _write(path, text):
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False, suffix=".tmp") as stream:
@@ -168,7 +180,7 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
             _write(output / f"{target}bits_security.md",
                    _markdown(settings, records, log_ns, labels, target))
 
-    def run(log_n, label, target, guess, workers):
+    def run(log_n, label, target, guess, prior, workers):
         key = _key(log_n, label, target)
         n = 1 << log_n
         cell_upper = n // 16 if upper is None else upper
@@ -193,7 +205,8 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
             guess = max(lower, min(cell_upper, guess))
         result = max_logq(n=n, secret=reference.secret, error=error, samples=samples,
                           upper=cell_upper, target=target, lower=lower, guess=guess, window=window,
-                          estimators=cell_estimators, cache=cache, jobs=workers, progress=report)
+                          estimators=cell_estimators, cache=cache, jobs=workers, progress=report,
+                          prior=prior)
         costs = {} if result.logq is None else result.costs[result.logq]
         return {
             "log_n": log_n, "secret": label, "target": target, "logq": result.logq,
@@ -219,7 +232,8 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
                 for cell in ready[:max(0, slots)]:
                     workers = max(1, slots // min(slots, len(ready)))
                     guess = _guess(records, *cell)
-                    running[pool.submit(run, *cell, guess, workers)] = (cell, workers)
+                    prior = _prior(records, *cell)
+                    running[pool.submit(run, *cell, guess, prior, workers)] = (cell, workers)
                     pending.remove(cell)
                 if not running:
                     break

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-setup_module = importlib.import_module("ckks_estimator.setup")
+setup_module = importlib.import_module("rlwe_params.setup")
 
 
 class SetupTests(unittest.TestCase):

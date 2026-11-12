@@ -6,7 +6,7 @@ from threading import Event
 import unittest
 from unittest.mock import patch
 
-from ckks_estimator import (
+from rlwe_params import (
     AttackEstimate, DiscreteGaussian, EstimationError, Parameters,
     SparseTernary, Ternary, UnsupportedParameters, evaluate,
 )
@@ -54,7 +54,7 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(result.unsupported, ("sparse-only",))
         self.assertEqual([len(e.attacks) for e in result.estimates], [2, 2])
         self.assertEqual([len(b.calls) for b in (first, second, skipped, fresh)], [2, 2, 0, 0])
-        self.assertTrue((self.path.parent / "ckks-estimator" / "estimates.sqlite3").is_file())
+        self.assertTrue((self.path.parent / "rlwe-params" / "estimates.sqlite3").is_file())
 
     def test_cache_invalidates_parameters_sources_models_and_configuration(self):
         evaluate(self.parameters, [Backend()], cache=self.path)
@@ -123,6 +123,15 @@ class EvaluationTests(unittest.TestCase):
         safe = evaluate(self.parameters, [Backend()], cache=self.path, jobs=1,
                         target="127.999999999999999999999999999999999999")
         self.assertTrue(safe.complete)
+
+    def test_order_starts_the_named_attacks_first(self):
+        backend = Backend()
+        result = evaluate(self.parameters, [backend], cache=False, jobs=1, target=128,
+                          order=[("synthetic", "second")])
+        self.assertEqual((backend.calls, result.complete), (["second"], False))
+        other = Backend()
+        evaluate(self.parameters, [other], cache=False, jobs=1, order=[("unknown", "first")])
+        self.assertEqual(other.calls, ["first", "second"])
 
     def test_parallel_refutation_cancels_running_attacks(self):
         started, cancelled = Event(), Event()
