@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 from rlwe_params import (
     AttackEstimate, DiscreteGaussian, EstimationError, Parameters,
-    SparseTernary, Ternary, UnsupportedParameters, estimate,
+    SparseTernary, Ternary, Uniform, UnsupportedParameters, estimate,
 )
 from rlwe_params._runtime import Worker, backend_command, pool
 from rlwe_params.cli import main
@@ -77,6 +77,11 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(supplied.secret, SparseTernary(8, 8))
         self.assertFalse(call.call_args.kwargs["cache"])
         self.assertEqual(json.loads(output.getvalue())["security_bits"], str(result.security_bits))
+        for flags, expected in ((["--sparse-binary", "16"], SparseTernary(16, 0)),
+                                (["--binary"], Uniform(0, 1))):
+            with patch("rlwe_params.cli.estimate", return_value=result) as call, redirect_stdout(io.StringIO()):
+                main(["estimate", "--log-n", "8", "--log-q", "15", *flags, "--no-cache"])
+            self.assertEqual(call.call_args.args[0].secret, expected)
         with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as failure:
             main(["estimate", "--n", "256", "--q", "32768", "--ternary", "--sigma", "invalid"])
         self.assertEqual(failure.exception.code, 1)

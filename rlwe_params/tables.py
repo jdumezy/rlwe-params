@@ -13,20 +13,52 @@ from .api import max_logq
 from .backend import EstimationError
 from .evaluation import default_jobs
 from ._runtime import process_limit
-from .parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary
+from .parameters import DiscreteGaussian, Parameters, SparseTernary, Ternary, Uniform
 from .profiles import profile as _profile
 
 
 FORMAT = 1
 
 
-def secret(label):
-    """"ternary" is uniform on {-1, 0, 1}. An integer h is a sparse ternary Hamming weight."""
-    if label == "ternary":
-        return Ternary()
+DENSE = ("ternary", "binary", "gaussian")
+
+
+def _sparse_binary(label):
+    if isinstance(label, str) and label.startswith("binary-"):
+        weight = label[len("binary-"):]
+        if weight.isdigit() and str(int(weight)) == weight and int(weight) > 0:
+            return int(weight)
+    return None
+
+
+def secret(label, sigma="3.2"):
+    """The secret of a table column.
+
+    An integer h is sparse ternary with Hamming weight h, and "binary-h" sparse
+    binary with h coefficients equal to 1. "ternary" is uniform on {-1, 0, 1},
+    "binary" uniform on {0, 1}, and "gaussian" a discrete Gaussian with sigma.
+    """
     if type(label) is int and label > 0:
         return SparseTernary.weight(label)
-    raise ValueError(f"Unknown secret {label!r}. Use 'ternary' or a positive Hamming weight.")
+    if _sparse_binary(label):
+        return SparseTernary(_sparse_binary(label), 0)
+    if label == "ternary":
+        return Ternary()
+    if label == "binary":
+        return Uniform(0, 1)
+    if label == "gaussian":
+        return DiscreteGaussian(sigma)
+    raise ValueError(f"Unknown secret {label!r}. Use a positive Hamming weight, "
+                     "'binary-H', 'ternary', 'binary', or 'gaussian'.")
+
+
+def _order(label):
+    """Sparse ternary by weight, then dense secrets, then sparse binary by weight."""
+    if type(label) is int:
+        return 0, label
+    if label in DENSE:
+        return 1, DENSE.index(label)
+    return 2, _sparse_binary(label)
 
 
 def _key(log_n, label, target):
@@ -86,23 +118,35 @@ def _write(path, text):
     temporary.replace(path)
 
 
+def _cell(record):
+    if record is None:
+        return ""
+    if record["status"] == "lower_bound_unsafe":
+        return "--"
+    if record["status"] == "upper_bound":
+        return f">={record['logq']}"
+    return str(record["logq"])
+
+
 def _markdown(settings, records, log_ns, labels, target):
-    header = " | ".join(str(label) for label in labels)
-    lines = [f"# Ciphertext modulus table for {target} bits of security", "",
-             f"| logn \\ h | {header} |", "| -------- |" + " --: |" * len(labels)]
-    for log_n in log_ns:
-        cells = []
-        for label in labels:
-            record = records.get(_key(log_n, label, target))
-            if record is None:
-                cells.append("")
-            elif record["status"] == "lower_bound_unsafe":
-                cells.append("--")
-            elif record["status"] == "upper_bound":
-                cells.append(f">={record['logq']}")
-            else:
-                cells.append(str(record["logq"]))
-        lines.append(f"| {log_n} | " + " | ".join(cells) + " |")
+    # Show every stored cell of this target, not only those of the current run.
+    stored = [record for record in records.values() if record["target"] == target]
+    log_ns = sorted({*log_ns, *(record["log_n"] for record in stored)})
+    labels = sorted({*labels, *(record["secret"] for record in stored)}, key=_order)
+    kinds = {"sparse ternary" if type(label) is int else
+             "sparse binary" if _sparse_binary(label) else label for label in labels}
+    lines = [f"# Ciphertext modulus table for {target} bits of security"]
+    groups = (("Sparse ternary secrets with Hamming weight `h`, and dense secrets",
+               [label for label in labels if _order(label)[0] < 2], str),
+              ("Sparse binary secrets with Hamming weight `h`",
+               [label for label in labels if _order(label)[0] == 2], lambda label: str(_sparse_binary(label))))
+    for title, columns, name in groups:
+        if not columns:
+            continue
+        lines += ["", f"{title}:", "", "| logn \\ h | " + " | ".join(name(label) for label in columns) + " |",
+                  "| -------- |" + " --: |" * len(columns)]
+        lines += [f"| {log_n} | " + " | ".join(_cell(records.get(_key(log_n, label, target)))
+                                              for label in columns) + " |" for log_n in log_ns]
     revisions = sorted({(name, revision) for record in records.values()
                         if record["target"] == target for name, revision in record["revisions"].items()})
     profile = settings["profile"]
@@ -116,8 +160,14 @@ def _markdown(settings, records, log_ns, labels, target):
         "",
         f"- Ring dimension `n = 2^logn`. Error: discrete Gaussian, `sigma = {settings['sigma']}`. "
         f"Samples: {'unlimited' if settings['samples'] is None else settings['samples']}.",
-        "- Secret: `h` coefficients in {-1, 1}, `h // 2` of them equal to 1, "
-        "or `ternary`, uniform on {-1, 0, 1}.",
+        *(f"- {text}" for kind, text in (
+            ("sparse ternary", "Sparse ternary: `h` coefficients in {-1, 1}, `h // 2` of them equal to 1, "
+                               "the rest 0."),
+            ("sparse binary", "Sparse binary: `h` coefficients equal to 1, the rest 0."),
+            ("ternary", "`ternary`: uniform on {-1, 0, 1}."),
+            ("binary", "`binary`: uniform on {0, 1}."),
+            ("gaussian", f"`gaussian`: discrete Gaussian with `sigma = {settings['sigma']}`, like the error."),
+        ) if kind in kinds),
         f"- Profile `{profile['name']}`: cost model {profile['cost_model']}, "
         f"shape model {profile['shape_model']}, backends {', '.join(profile['backends'])}.",
     ]
@@ -142,13 +192,13 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
     Return the records and the failures, mapping cell keys to exceptions.
     """
     log_ns = sorted(dict.fromkeys(log_ns))
-    labels = sorted({label for label in secrets if label != "ternary"}) + \
-        (["ternary"] if "ternary" in secrets else [])
+    labels = list(dict.fromkeys(secrets))
+    for label in labels:
+        secret(label)
+    labels.sort(key=_order)
     targets = sorted(dict.fromkeys(targets))
     if not log_ns or not labels or not targets:
         raise ValueError("Select at least one ring dimension, secret, and target.")
-    for label in labels:
-        secret(label)
     if any(type(value) is not int or value < 1 for value in (*log_ns, *targets)):
         raise ValueError("Ring dimensions and targets must be positive integers.")
     jobs = default_jobs() if jobs is None else jobs
@@ -185,7 +235,7 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
         key = _key(log_n, label, target)
         n = 1 << log_n
         cell_upper = n // 16 if upper is None else upper
-        reference = Parameters(n, 2, secret(label), error, samples)
+        reference = Parameters(n, 2, secret(label, sigma), error, samples)
         cell_estimators = tuple(_Stoppable(estimator, stop) for estimator in factory(reference))
         with lock:
             active.extend(cell_estimators)

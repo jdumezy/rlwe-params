@@ -9,7 +9,9 @@ import time
 import unittest
 from unittest.mock import patch
 
-from rlwe_params import AttackEstimate, EstimationError, SparseTernary, Ternary, run_table
+from rlwe_params import (
+    AttackEstimate, DiscreteGaussian, EstimationError, SparseTernary, Ternary, Uniform, run_table,
+)
 from rlwe_params.cli import main
 from rlwe_params.tables import _prior, secret
 
@@ -36,13 +38,15 @@ class Curve:
         self.log.append((parameters.n, logq, name))
         if self.fail is not None and self.fail(parameters):
             raise RuntimeError("attack failed")
-        density = Decimal("3.5") if isinstance(parameters.secret, Ternary) else \
-            min(Decimal("3.5"), Decimal(parameters.secret.h) / 20)
+        density = min(Decimal("3.5"), Decimal(parameters.secret.h) / 20) \
+            if isinstance(parameters.secret, SparseTernary) else Decimal("3.5")
         return AttackEstimate(name, density * parameters.n / logq + (0 if name == "primal" else 5))
 
 
 def expected(log_n, label, target):
-    density = Decimal("3.5") if label == "ternary" else min(Decimal("3.5"), Decimal(label) / 20)
+    weight = label if type(label) is int else \
+        int(label[len("binary-"):]) if label.startswith("binary-") else None
+    density = Decimal("3.5") if weight is None else min(Decimal("3.5"), Decimal(weight) / 20)
     return int(density * (1 << log_n) / target)
 
 
@@ -135,6 +139,27 @@ class TableTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "at least one"):
             run_table(log_ns=[12], secrets=[], targets=[128], output=self.output)
 
+    def test_secret_kinds_and_tables_keep_stored_columns(self):
+        self.assertEqual(secret("binary-64"), SparseTernary(64, 0))
+        self.assertEqual(secret("binary"), Uniform(0, 1))
+        self.assertEqual(secret("gaussian", "3.19"), DiscreteGaussian("3.19"))
+        for label in ("binary-0", "binary-064", "binary-x", "uniform"):
+            with self.assertRaises(ValueError):
+                secret(label)
+        self.run_grid(log_ns=[12], secrets=["ternary", 32], targets=[128])
+        records, failures, _ = self.run_grid(log_ns=[12, 13], secrets=["gaussian", "binary-64", "binary"],
+                                             targets=[128])
+        self.assertEqual(failures, {})
+        self.assertEqual(records["13:binary-64:128"]["logq"], expected(13, "binary-64", 128))
+        self.assertEqual(records["12:gaussian:128"]["secret"], "gaussian")
+        table = (self.output / "128bits_security.md").read_text()
+        # The first run's columns stay, in a fixed order, with sparse binary apart.
+        self.assertIn("| logn \\ h | 32 | ternary | binary | gaussian |", table)
+        self.assertIn(f"| 12 | {expected(12, 32, 128)} | {expected(12, 'ternary', 128)} |", table)
+        self.assertIn(f"| 13 |  |  | {expected(13, 'binary', 128)} |", table)
+        self.assertIn("Sparse binary secrets", table)
+        self.assertIn(f"| logn \\ h | 64 |\n| -------- | --: |\n| 12 | {expected(12, 'binary-64', 128)} |", table)
+
     def test_interruption_abandons_running_cells_and_starts_no_more(self):
         started, cancelled = Event(), Event()
         calls = []
@@ -176,6 +201,7 @@ class TableTests(unittest.TestCase):
 
     def test_cli_builds_the_grid(self):
         arguments = ["table", "--log-n", "12", "13", "--h", "32", "64", "--ternary",
+                     "--sparse-binary", "64", "--binary", "--gaussian",
                      "--target", "128", "192", "--output", str(self.output), "--no-cache",
                      "--jobs", "2", "--backend", "malb"]
         output = io.StringIO()
@@ -184,7 +210,7 @@ class TableTests(unittest.TestCase):
             main(arguments)
         options = call.call_args.kwargs
         self.assertEqual((options["log_ns"], options["secrets"], options["targets"]),
-                         ([12, 13], [32, 64, "ternary"], [128, 192]))
+                         ([12, 13], [32, 64, "binary-64", "ternary", "binary", "gaussian"], [128, 192]))
         self.assertEqual((options["sigma"], options["jobs"], options["cache"]), ("3.2", 2, False))
         self.assertEqual(options["profile"].backends, ("malb",))
         with patch("rlwe_params.tables.run_table", return_value=({}, {"12:32:128": RuntimeError("x")})):

@@ -79,7 +79,9 @@ print(max_logq(n=2**16, secret=secret, error=error, upper=4096, target=128).logq
 Conventions:
 
 - `q` is the largest modulus an attacker sees, such as `QP` when key-switching keys are public.
-- A sparse secret of weight `h` has `h // 2` coefficients equal to 1 and the rest equal to -1.
+- A sparse ternary secret of weight `h` (`--h`) has `h // 2` nonzero coefficients equal to 1 and the rest equal to -1.
+  A sparse binary secret (`--sparse-binary`) has `h` coefficients equal to 1.
+  Other secrets are `--ternary` and `--binary`, uniform on {-1, 0, 1} and {0, 1}, and `--gaussian`.
 - The error is a discrete Gaussian with `sigma = 3.2` by default, and the number of samples is unlimited by default.
 - Costs are rounded down. Results only hold against the attacks of the selected estimators, under their cost models. They are not security proofs, and a new attack can lower them.
 

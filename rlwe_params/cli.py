@@ -46,9 +46,12 @@ def _parameters(query):
     dimension.add_argument("--log-n", type=_positive, help="Ring dimension is 2**LOG_N.")
     secret = query.add_mutually_exclusive_group(required=True)
     secret.add_argument("--h", type=_positive, help="Sparse ternary secret with Hamming weight H.")
+    secret.add_argument("--sparse-binary", type=_positive, metavar="H",
+                        help="Sparse binary secret with H coefficients equal to 1.")
     secret.add_argument("--ternary", action="store_true", help="Secret uniform on {-1, 0, 1}.")
+    secret.add_argument("--binary", action="store_true", help="Secret uniform on {0, 1}.")
     secret.add_argument("--uniform", nargs=2, type=int, metavar=("LOWER", "UPPER"))
-    secret.add_argument("--gaussian", metavar="STDDEV")
+    secret.add_argument("--gaussian", metavar="STDDEV", help="Discrete Gaussian secret.")
     _common(query)
     output = query.add_mutually_exclusive_group()
     output.add_argument("--details", action="store_true", help="Include each attack's estimate.")
@@ -160,7 +163,12 @@ def main(argv=None):
                     "Completed cells are reused when rerun with the same settings.")
     table.add_argument("--log-n", type=_positive, nargs="+", required=True)
     table.add_argument("--h", type=_positive, nargs="*", default=[], help="Sparse Hamming weights.")
-    table.add_argument("--ternary", action="store_true", help="Add a uniform ternary secret column.")
+    table.add_argument("--sparse-binary", type=_positive, nargs="*", default=[], metavar="H",
+                       help="Sparse binary Hamming weights.")
+    table.add_argument("--ternary", action="store_true", help="Add a secret column uniform on {-1, 0, 1}.")
+    table.add_argument("--binary", action="store_true", help="Add a secret column uniform on {0, 1}.")
+    table.add_argument("--gaussian", action="store_true",
+                       help="Add a discrete Gaussian secret column, with the error's sigma.")
     table.add_argument("--target", type=_positive, nargs="+", default=[128],
                        help="Security targets in bits. Default: 128.")
     table.add_argument("--output", type=Path, required=True, help="Output directory.")
@@ -191,7 +199,8 @@ def _run(parser, arguments):
         if arguments.command == "table":
             from .tables import run_table
 
-            secrets = [*arguments.h, *(["ternary"] if arguments.ternary else [])]
+            secrets = [*arguments.h, *(f"binary-{h}" for h in arguments.sparse_binary),
+                       *(label for label in ("ternary", "binary", "gaussian") if getattr(arguments, label))]
             _, failures = run_table(
                 log_ns=arguments.log_n, secrets=secrets, targets=arguments.target,
                 output=arguments.output, sigma=arguments.sigma, samples=arguments.samples,
@@ -206,8 +215,12 @@ def _run(parser, arguments):
             return
         if arguments.h is not None:
             secret = SparseTernary.weight(arguments.h)
+        elif arguments.sparse_binary is not None:
+            secret = SparseTernary(arguments.sparse_binary, 0)
         elif arguments.ternary:
             secret = Ternary()
+        elif arguments.binary:
+            secret = Uniform(0, 1)
         elif arguments.uniform is not None:
             secret = Uniform(*arguments.uniform)
         else:
