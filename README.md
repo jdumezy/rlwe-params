@@ -37,7 +37,7 @@ docker run --rm -v "$PWD:/work" rlwe-params estimate --log-n 16 --log-q 1475 --h
 
 ## Precomputed tables
 
-Tables for 128, 192, and 256 bits, `logn` from 12 to 17, sparse secrets with `h` from 32 to 2048, and ternary secrets are being regenerated with this tool and will be published in `tables/`.
+[`tables/128bits_security.md`](tables/128bits_security.md) gives the largest `logq` for 128 bits of security, with `logn` from 12 to 17, sparse secrets with `h` from 32 to 2048, and ternary secrets.
 
 Each cell is the largest `logq` such that every attack of the listed estimators costs at least the target at `q = 2^logq`, and the next `logq` has an attack below it.
 `--` means even the smallest searched `logq` fails, and `>=U` means the upper search bound passes.
