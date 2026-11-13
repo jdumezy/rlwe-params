@@ -1,0 +1,1828 @@
+{
+  "settings": {
+    "format": 1,
+    "sigma": "3.2",
+    "samples": null,
+    "lower": 15,
+    "upper": null,
+    "window": 2,
+    "profile": {
+      "name": "matzov",
+      "cost_model": "MATZOV",
+      "shape_model": "GSA",
+      "backends": [
+        "malb",
+        "tabog"
+      ],
+      "attacks": {}
+    }
+  },
+  "cells": {
+    "12:1024:128": {
+      "log_n": 12,
+      "secret": 1024,
+      "target": 128,
+      "logq": 105,
+      "status": "boundary",
+      "security_bits": "129.0058022506312078423937403123308594396",
+      "binding": "malb/lattice-estimator / dual_hybrid",
+      "costs": {
+        "malb/lattice-estimator / bdd": "129.2248889195879777296848347274945809470",
+        "malb/lattice-estimator / usvp": "129.6994848873704516262660891022069626587",
+        "malb/lattice-estimator / bdd_hybrid": "129.2396838152324020749142609301574111589",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "155.4095821013421303084766189287465517216",
+        "malb/lattice-estimator / dual": "131.2991783760023386696758840225984178883",
+        "malb/lattice-estimator / dual_hybrid": "129.0058022506312078423937403123308594396",
+        "malb/lattice-estimator / dual_mitm_hybrid": "145.4738573696539982061094946665778418412",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "129.2396838152324020749142609301574111589",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "136.7086668643789336663475407236879590986",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "148.0918833059053516159362282838579949299",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "149.9076812591474625908285902173457122302"
+      },
+      "checked_interval": [
+        103,
+        106
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 8,
+      "full_evaluations": 3,
+      "seconds": 69.6
+    },
+    "12:128:128": {
+      "log_n": 12,
+      "secret": 128,
+      "target": 128,
+      "logq": 85,
+      "status": "boundary",
+      "security_bits": "129.1157488459416819790430498686036011307",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "129.1157488459416819790430498686036011307",
+        "malb/lattice-estimator / usvp": "159.6198477528899255931074946238274363640",
+        "malb/lattice-estimator / bdd": "158.9367773356957173292002950866904758310",
+        "malb/lattice-estimator / bdd_hybrid": "144.9648345009971283008048716820801503603",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "138.7582436206094375840893454226517281312",
+        "malb/lattice-estimator / dual": "161.5070441852549623168951271201752612220",
+        "malb/lattice-estimator / dual_hybrid": "156.5055914264336499892993019396638049336",
+        "malb/lattice-estimator / dual_mitm_hybrid": "140.6118758508225581398669131621361610995",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "135.7139919718713916303260845758733843396",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "135.8829691581690830840206168419340642213",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.1997493136578367777443922507758795899"
+      },
+      "checked_interval": [
+        83,
+        86
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 25,
+      "full_evaluations": 6,
+      "seconds": 375.5
+    },
+    "12:192:128": {
+      "log_n": 12,
+      "secret": 192,
+      "target": 128,
+      "logq": 96,
+      "status": "boundary",
+      "security_bits": "128.3413785892815434341149704160816167291",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.3413785892815434341149704160816167291",
+        "malb/lattice-estimator / usvp": "140.7561514386678543893366805133415600404",
+        "malb/lattice-estimator / bdd": "140.2442818425637576660262877471220518130",
+        "malb/lattice-estimator / bdd_hybrid": "137.2492795031652135141176516664877934876",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "136.8901111706733325752794382517299385249",
+        "malb/lattice-estimator / dual": "142.3107808957520275313921506161635221898",
+        "malb/lattice-estimator / dual_hybrid": "138.7395862403238708408998887218139192582",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.5071987309538354774648347552606337056",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "129.3622067750239092606406152246313518517",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "129.7711446278557028231519621047203402848",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.6951324175670534650212153523052005508"
+      },
+      "checked_interval": [
+        94,
+        97
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 19,
+      "full_evaluations": 6,
+      "seconds": 264.4
+    },
+    "12:2048:128": {
+      "log_n": 12,
+      "secret": 2048,
+      "target": 128,
+      "logq": 106,
+      "status": "boundary",
+      "security_bits": "128.6363288161390467309234101119887422793",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / usvp": "129.1339007347467325635314733542812165674",
+        "malb/lattice-estimator / bdd": "128.6363288161390467309234101119887422793",
+        "malb/lattice-estimator / bdd_hybrid": "128.6503161613830346796544600887052802988",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "174.7315014655082620016963470144471628490",
+        "malb/lattice-estimator / dual": "130.7299353115137185199943407249805122402",
+        "malb/lattice-estimator / dual_hybrid": "129.0090592584762582461602539523567111998",
+        "malb/lattice-estimator / dual_mitm_hybrid": "1617.913403837273646563594980938630242738",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.6503161613830346796544600887052802988",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "153.8087149952547685612177011152018076098",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "169.3338457792791149647307293903949827946",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "172.9403094599056353961222167874162902806"
+      },
+      "checked_interval": [
+        104,
+        107
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 89.6
+    },
+    "12:256:128": {
+      "log_n": 12,
+      "secret": 256,
+      "target": 128,
+      "logq": 100,
+      "status": "boundary",
+      "security_bits": "128.2105406412793481097188415550470336711",
+      "binding": "TabOg/mlwe-hybrids / primal-projected-cvp",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.8263424702519935233575172250861574485",
+        "malb/lattice-estimator / usvp": "135.2009445467401033317708135913975766103",
+        "malb/lattice-estimator / bdd": "134.6612986272034678228746569896045971272",
+        "malb/lattice-estimator / bdd_hybrid": "134.6738385802741303612752087683464332216",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "137.4803482234368796135305828373061337836",
+        "malb/lattice-estimator / dual": "136.7294644049726706534296976757673010649",
+        "malb/lattice-estimator / dual_hybrid": "133.1893913927619360472812190396394397146",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.9000785253760642385689411070155164648",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.2105406412793481097188415550470336711",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "130.0500218998668182900845600363854888405",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.1612665966868742943047041906793434773"
+      },
+      "checked_interval": [
+        98,
+        101
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 11,
+      "full_evaluations": 4,
+      "seconds": 140.7
+    },
+    "12:32:128": {
+      "log_n": 12,
+      "secret": 32,
+      "target": 128,
+      "logq": 19,
+      "status": "boundary",
+      "security_bits": "128.6017793716791431133125116417089977546",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.6017793716791431133125116417089977546",
+        "malb/lattice-estimator / usvp": "Infinity",
+        "malb/lattice-estimator / bdd": "513.9920997005591782684013412384158633547",
+        "malb/lattice-estimator / bdd_hybrid": "153.5700698121883132527941313754045119376",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "135.6570247538639956830535506909781498887",
+        "malb/lattice-estimator / dual": "Infinity",
+        "malb/lattice-estimator / dual_hybrid": "Infinity",
+        "malb/lattice-estimator / dual_mitm_hybrid": "144.0209136831734180666418300224135172015",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "151.4530342039048520901045880863089181453",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "151.9695846923396389111892952130050784805",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "133.5855368125974529133269908583799129950"
+      },
+      "checked_interval": [
+        17,
+        20
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 29,
+      "full_evaluations": 6,
+      "seconds": 254.2
+    },
+    "12:512:128": {
+      "log_n": 12,
+      "secret": 512,
+      "target": 128,
+      "logq": 104,
+      "status": "boundary",
+      "security_bits": "129.0057266825311386997503689960288601197",
+      "binding": "malb/lattice-estimator / dual_hybrid",
+      "costs": {
+        "malb/lattice-estimator / dual_hybrid": "129.0057266825311386997503689960288601197",
+        "malb/lattice-estimator / usvp": "130.4886407581582967066463789528978628623",
+        "malb/lattice-estimator / bdd": "129.8583525104313638157166990521243325685",
+        "malb/lattice-estimator / bdd_hybrid": "129.8637698614421828195812930367098953264",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "141.8543832892997318340400626699703838315",
+        "malb/lattice-estimator / dual": "131.7242220705658172038451782708590000413",
+        "malb/lattice-estimator / dual_mitm_hybrid": "143.0582501743743988735348465334577942817",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "129.1043733647105161869247119732705439374",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "130.4401557452662740079641843051069164807",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "136.2124965440519045404629745262884513031",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "136.9438390381704110885464614341555136408"
+      },
+      "checked_interval": [
+        102,
+        105
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 8,
+      "full_evaluations": 3,
+      "seconds": 71.6
+    },
+    "12:64:128": {
+      "log_n": 12,
+      "secret": 64,
+      "target": 128,
+      "logq": 57,
+      "status": "boundary",
+      "security_bits": "128.6758762123654763549044855898570709485",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.6758762123654763549044855898570709485",
+        "malb/lattice-estimator / usvp": "242.6404524630466137327253265556192620101",
+        "malb/lattice-estimator / bdd": "241.5951494892203416838895717247401583896",
+        "malb/lattice-estimator / bdd_hybrid": "151.5540516032340684639594411594947041290",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "137.5276474036673743572945272625679891051",
+        "malb/lattice-estimator / dual": "246.1934292544881037126161519232758645510",
+        "malb/lattice-estimator / dual_hybrid": "234.0455526210340615677617690978265110656",
+        "malb/lattice-estimator / dual_mitm_hybrid": "138.1961095415363397395558700013973704704",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "145.3974206268114850148948704236912994789",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "146.0029497107935548760803796179903061499",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.8703832108019805880473408577846239468"
+      },
+      "checked_interval": [
+        55,
+        58
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 20,
+      "full_evaluations": 5,
+      "seconds": 209.5
+    },
+    "12:ternary:128": {
+      "log_n": 12,
+      "secret": "ternary",
+      "target": 128,
+      "logq": 106,
+      "status": "boundary",
+      "security_bits": "128.9131245084633454300842101396519506608",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / bdd": "128.9131245084633454300842101396519506608",
+        "malb/lattice-estimator / usvp": "129.4129875399600188376128219630834147331",
+        "malb/lattice-estimator / bdd_hybrid": "128.9303859356030779583168799929004427641",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "183.8632949721057237659171618828576304639",
+        "malb/lattice-estimator / dual": "131.0179657149460473206680823310905621358",
+        "malb/lattice-estimator / dual_hybrid": "129.5814561078114816872724894399975731992",
+        "malb/lattice-estimator / dual_mitm_hybrid": "140.7416827764453679563177314877391683106"
+      },
+      "checked_interval": [
+        104,
+        107
+      ],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56"
+      },
+      "evaluations": 7,
+      "full_evaluations": 3,
+      "seconds": 40.7
+    },
+    "13:1024:128": {
+      "log_n": 13,
+      "secret": 1024,
+      "target": 128,
+      "logq": 211,
+      "status": "boundary",
+      "security_bits": "128.5279070781254062552054251158741554169",
+      "binding": "TabOg/mlwe-hybrids / primal-projected-cvp",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.5279070781254062552054251158741554169",
+        "malb/lattice-estimator / usvp": "129.6022891995731415607063768493002612588",
+        "malb/lattice-estimator / bdd": "129.3533562998726189857699307540451061946",
+        "malb/lattice-estimator / bdd_hybrid": "129.3773573343370779203754369198585304025",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "140.2707630963234397271699183902687483137",
+        "malb/lattice-estimator / dual": "130.9766853641353329892687101334600536349",
+        "malb/lattice-estimator / dual_hybrid": "129.5434802509185763716630751727796207272",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.2015244554258299119477780821887616912",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "129.6398511883964163973020934175856208543",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "134.9463418990241955102248557831990223757",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "135.5736404673933649174366867534815945024"
+      },
+      "checked_interval": [
+        209,
+        212
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 258.5
+    },
+    "13:128:128": {
+      "log_n": 13,
+      "secret": 128,
+      "target": 128,
+      "logq": 167,
+      "status": "boundary",
+      "security_bits": "128.0041610138436720641573411733171444596",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0041610138436720641573411733171444596",
+        "malb/lattice-estimator / usvp": "165.1127072829908622360423668850674375110",
+        "malb/lattice-estimator / bdd": "164.6218982584426398450691051325319490183",
+        "malb/lattice-estimator / bdd_hybrid": "147.5582983694102232330738635659050085120",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "138.6560988429542045645303022105302609481",
+        "malb/lattice-estimator / dual": "166.5023174979621213679486495012194288983",
+        "malb/lattice-estimator / dual_hybrid": "163.7903785849333879404412521310454239140",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.9961578719632891129562071379848662314",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "138.9169066053070853909332356701175907293",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "137.6058992258980711174749119106534340051",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.9461300220716851804097695708653622172"
+      },
+      "checked_interval": [
+        165,
+        168
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 302.0
+    },
+    "13:192:128": {
+      "log_n": 13,
+      "secret": 192,
+      "target": 128,
+      "logq": 186,
+      "status": "boundary",
+      "security_bits": "128.2140966448415803010855954248605389233",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.2140966448415803010855954248605389233",
+        "malb/lattice-estimator / usvp": "147.0979657632038067573305820789728068748",
+        "malb/lattice-estimator / bdd": "146.8422582207900514017767981991519796975",
+        "malb/lattice-estimator / bdd_hybrid": "141.5207983728468943130935205850419712264",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "137.6261938078788107093828626437139752612",
+        "malb/lattice-estimator / dual": "148.7305563340271906968102004910264714336",
+        "malb/lattice-estimator / dual_hybrid": "146.4403114479977163639004588884321447394",
+        "malb/lattice-estimator / dual_mitm_hybrid": "138.0475060752038493330902658155377972119",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "132.3401939676457248199011497095497319752",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "132.2239812975129045153177504971914841866",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.5457825293131066693667091513132575007"
+      },
+      "checked_interval": [
+        184,
+        187
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 7,
+      "full_evaluations": 2,
+      "seconds": 385.3
+    },
+    "13:2048:128": {
+      "log_n": 13,
+      "secret": 2048,
+      "target": 128,
+      "logq": 213,
+      "status": "boundary",
+      "security_bits": "128.2942969754788845031133811543021023573",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / bdd": "128.2942969754788845031133811543021023573",
+        "malb/lattice-estimator / usvp": "128.5286288565303145171742981680590872321",
+        "malb/lattice-estimator / bdd_hybrid": "128.3055562228912128944184452996986433700",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "152.7611110561972348397942600301156976594",
+        "malb/lattice-estimator / dual": "129.8311200240291741663985730381723886306",
+        "malb/lattice-estimator / dual_hybrid": "128.6842470345517832436359075988260009657",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.4830381932225369729453974189917882106",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.3055562228912128944184452996986433700",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "133.8198332387461077866120468902650170354",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "145.3145114041605864907877073123816666400",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "147.1233927285717147332994561909300064924"
+      },
+      "checked_interval": [
+        211,
+        214
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 230.3
+    },
+    "13:256:128": {
+      "log_n": 13,
+      "secret": 256,
+      "target": 128,
+      "logq": 196,
+      "status": "boundary",
+      "security_bits": "128.2738842183514615535085618110937291800",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.2738842183514615535085618110937291800",
+        "malb/lattice-estimator / usvp": "139.3127025957358650712211486661005102256",
+        "malb/lattice-estimator / bdd": "139.0569234506335429482648506081721277716",
+        "malb/lattice-estimator / bdd_hybrid": "137.2104674938036683237448156124402435361",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "136.3274502049787408164496112010660395904",
+        "malb/lattice-estimator / dual": "140.7113273835864353287227237858571725269",
+        "malb/lattice-estimator / dual_hybrid": "138.7069774337522917223571596381795282752",
+        "malb/lattice-estimator / dual_mitm_hybrid": "137.6487538390600179362444953770292378731",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "129.5668644731322666245005129623868765089",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "129.5673673647677794345937865121843509030",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.3188869466807446141966353162465527511"
+      },
+      "checked_interval": [
+        194,
+        197
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 10,
+      "full_evaluations": 3,
+      "seconds": 390.7
+    },
+    "13:32:128": {
+      "log_n": 13,
+      "secret": 32,
+      "target": 128,
+      "logq": 37,
+      "status": "boundary",
+      "security_bits": "128.3052105492316375053764015015539900899",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.3052105492316375053764015015539900899",
+        "malb/lattice-estimator / usvp": "Infinity",
+        "malb/lattice-estimator / bdd": "Infinity",
+        "malb/lattice-estimator / bdd_hybrid": "155.0126585011916258594594297217929334233",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "136.3928468285458939359740498709527274869",
+        "malb/lattice-estimator / dual": "Infinity",
+        "malb/lattice-estimator / dual_hybrid": "Infinity",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.4916914013541042813465495930737350194",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "152.0682131866862921026117466298481471744",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "152.8878457115701561323642945314127454702",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "133.2858563497812518202683530836467121273"
+      },
+      "checked_interval": [
+        35,
+        38
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 167.6
+    },
+    "13:512:128": {
+      "log_n": 13,
+      "secret": 512,
+      "target": 128,
+      "logq": 208,
+      "status": "boundary",
+      "security_bits": "128.2233575505705980899493638873006729493",
+      "binding": "TabOg/mlwe-hybrids / primal-projected-cvp",
+      "costs": {
+        "malb/lattice-estimator / usvp": "131.2577670858812086808414757526826517202",
+        "malb/lattice-estimator / bdd": "131.0151921417507473558132950138220355500",
+        "malb/lattice-estimator / bdd_hybrid": "131.0227790838078276710116134497694142147",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "135.7098813747790866962392606053037849190",
+        "malb/lattice-estimator / dual": "132.5465433612011112735581491911326835665",
+        "malb/lattice-estimator / dual_hybrid": "130.8698851683995855846324797457416331219",
+        "malb/lattice-estimator / dual_mitm_hybrid": "137.6254068758581401550419861831178902453",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.2233575505705980899493638873006729493",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.2234476067299825242136572456064546354",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "130.7662803886669911983507366207256593830",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.4963770774222674328975717751657528955"
+      },
+      "checked_interval": [
+        206,
+        209
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 1,
+      "seconds": 183.3
+    },
+    "13:64:128": {
+      "log_n": 13,
+      "secret": 64,
+      "target": 128,
+      "logq": 112,
+      "status": "boundary",
+      "security_bits": "128.5579290957650002275771564775704474511",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.5579290957650002275771564775704474511",
+        "malb/lattice-estimator / usvp": "254.9159047264876601668973390908889405433",
+        "malb/lattice-estimator / bdd": "254.2217985273313183000343788225901399366",
+        "malb/lattice-estimator / bdd_hybrid": "154.5427403031321808630238614738003424567",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "138.3414132379025426168810730747970950436",
+        "malb/lattice-estimator / dual": "257.1237338547409952472943878811898138411",
+        "malb/lattice-estimator / dual_hybrid": "249.9573074417456967761176864845996084927",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.3696187141331136489949554946601376048",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "146.4742026498884562720826762239921942303",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "146.5076628740108826967804593252646750911",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.7370567889637776330770482741707052887"
+      },
+      "checked_interval": [
+        110,
+        113
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 249.9
+    },
+    "13:ternary:128": {
+      "log_n": 13,
+      "secret": "ternary",
+      "target": 128,
+      "logq": 214,
+      "status": "boundary",
+      "security_bits": "128.2551449232824245089000032647796539518",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / bdd": "128.2551449232824245089000032647796539518",
+        "malb/lattice-estimator / usvp": "128.4974903447214100958652356491580321315",
+        "malb/lattice-estimator / bdd_hybrid": "128.2618461069690247481938727082195622855",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "169.8697043937447949002444238350446798622",
+        "malb/lattice-estimator / dual": "129.5467669209436424215991214680597481262",
+        "malb/lattice-estimator / dual_hybrid": "128.9720047102711946164735527542041333771",
+        "malb/lattice-estimator / dual_mitm_hybrid": "134.2813559308849635416843499006866676051"
+      },
+      "checked_interval": [
+        212,
+        215
+      ],
+      "upper": 512,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 125.6
+    },
+    "14:1024:128": {
+      "log_n": 14,
+      "secret": 1024,
+      "target": 128,
+      "logq": 424,
+      "status": "boundary",
+      "security_bits": "128.1549621777760727729753057563731781713",
+      "binding": "TabOg/mlwe-hybrids / primal-projected-cvp",
+      "costs": {
+        "malb/lattice-estimator / usvp": "129.7988139183074873603395092929675757264",
+        "malb/lattice-estimator / bdd": "129.6146634194786475818661090000936568677",
+        "malb/lattice-estimator / bdd_hybrid": "129.6177695243123965046867528853524605493",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "134.3290578499428148263354088509664036315",
+        "malb/lattice-estimator / dual": "130.7837721541656366984465919588953256085",
+        "malb/lattice-estimator / dual_hybrid": "130.2128933324814040589117262123589057013",
+        "malb/lattice-estimator / dual_mitm_hybrid": "136.4904401616313526031413090240638862529",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.1549621777760727729753057563731781713",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.2700810749329271272816204185340843698",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "130.9202212696589927353274593111216817464",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.2720392012643570237447743485784245266"
+      },
+      "checked_interval": [
+        422,
+        425
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 1,
+      "seconds": 396.1
+    },
+    "14:128:128": {
+      "log_n": 14,
+      "secret": 128,
+      "target": 128,
+      "logq": 332,
+      "status": "boundary",
+      "security_bits": "128.0485279271721711554616343041151484284",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0485279271721711554616343041151484284",
+        "malb/lattice-estimator / usvp": "168.0983260112026438591550422791428707042",
+        "malb/lattice-estimator / bdd": "167.8441567646454218584196437377638165001",
+        "malb/lattice-estimator / bdd_hybrid": "149.9051179030190507609392908523012794901",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "139.5094407027470980029686586264071695075",
+        "malb/lattice-estimator / dual": "169.1852376840746265861051427886101359428",
+        "malb/lattice-estimator / dual_hybrid": "167.7544245602211548433793781269438335380",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.3736595092302161285569842771246307503",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "140.4392002373125911768193491943656666979",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "140.6599766378041186286651645303057184229",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "130.5220990298468412212996383478256828914"
+      },
+      "checked_interval": [
+        330,
+        333
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 692.8
+    },
+    "14:192:128": {
+      "log_n": 14,
+      "secret": 192,
+      "target": 128,
+      "logq": 367,
+      "status": "boundary",
+      "security_bits": "128.3146298938431516287328955668385435639",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.3146298938431516287328955668385435639",
+        "malb/lattice-estimator / usvp": "150.8752058187479835787164833970837702265",
+        "malb/lattice-estimator / bdd": "150.6374441428845700814238835585512088130",
+        "malb/lattice-estimator / bdd_hybrid": "144.3071189734322389327075346770952208575",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "138.5788987104523040891521301122844540192",
+        "malb/lattice-estimator / dual": "152.1234777337326806558746741454650166640",
+        "malb/lattice-estimator / dual_hybrid": "150.8385477493229449784324962228846719229",
+        "malb/lattice-estimator / dual_mitm_hybrid": "138.0935453601116174671158669694544647478",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "134.1463831282162821156890446674644450644",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "134.2833338978556903697603129937294360624",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.7781619144208219708525959122006779618"
+      },
+      "checked_interval": [
+        365,
+        368
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 7,
+      "full_evaluations": 2,
+      "seconds": 853.5
+    },
+    "14:2048:128": {
+      "log_n": 14,
+      "secret": 2048,
+      "target": 128,
+      "logq": 428,
+      "status": "boundary",
+      "security_bits": "128.1731141781496976894035650526944500866",
+      "binding": "TabOg/mlwe-hybrids / primal-projected-cvp",
+      "costs": {
+        "malb/lattice-estimator / usvp": "128.6911128966925965719784921127299258564",
+        "malb/lattice-estimator / bdd": "128.4981917184284886672990275690842623504",
+        "malb/lattice-estimator / bdd_hybrid": "128.5020084282992163617803414125625369697",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "139.7961795382539859300016765641082202805",
+        "malb/lattice-estimator / dual": "129.6404606395300663365410960883283302698",
+        "malb/lattice-estimator / dual_hybrid": "129.2126668301199946070197335669210498976",
+        "malb/lattice-estimator / dual_mitm_hybrid": "136.6857586290705515469545834106816358276",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.1731141781496976894035650526944500866",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.7266938881945029105864222862222325832",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "133.8563911291787044658672206431302329054",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "134.6423422691070104530294319922611869509"
+      },
+      "checked_interval": [
+        426,
+        429
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 1,
+      "seconds": 355.9
+    },
+    "14:256:128": {
+      "log_n": 14,
+      "secret": 256,
+      "target": 128,
+      "logq": 387,
+      "status": "boundary",
+      "security_bits": "128.0532933539709342004148177670937429675",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0532933539709342004148177670937429675",
+        "malb/lattice-estimator / usvp": "142.5603461997203675816438188029447385728",
+        "malb/lattice-estimator / bdd": "142.5066600084358738842202548801347602776",
+        "malb/lattice-estimator / bdd_hybrid": "139.7787120367009156963475555009063132817",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "136.7419286322687064802109891822311726637",
+        "malb/lattice-estimator / dual": "143.8132569665529932563554538773515928004",
+        "malb/lattice-estimator / dual_hybrid": "142.6710806318956424732910917817729146913",
+        "malb/lattice-estimator / dual_mitm_hybrid": "137.3286554641654094253696254847786642735",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "131.1717642220264873308514002586268243906",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "131.0422981035753785836538589587797364929",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.0263332947216611776462935919119426679"
+      },
+      "checked_interval": [
+        385,
+        388
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 7,
+      "full_evaluations": 2,
+      "seconds": 887.2
+    },
+    "14:32:128": {
+      "log_n": 14,
+      "secret": 32,
+      "target": 128,
+      "logq": 77,
+      "status": "boundary",
+      "security_bits": "128.0494452082478865423075743040431911524",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0494452082478865423075743040431911524",
+        "malb/lattice-estimator / usvp": "Infinity",
+        "malb/lattice-estimator / bdd": "Infinity",
+        "malb/lattice-estimator / bdd_hybrid": "156.0114726573101750469657205893497173500",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "136.9027685757254281658749662334041516764",
+        "malb/lattice-estimator / dual": "Infinity",
+        "malb/lattice-estimator / dual_hybrid": "Infinity",
+        "malb/lattice-estimator / dual_mitm_hybrid": "131.4242659148351773006377940356624661683",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "156.3845036349366855668407027281443727674",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "156.2933207776931709060741919661050403519",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "132.8682742540273272467454184894075470741"
+      },
+      "checked_interval": [
+        75,
+        78
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 8,
+      "full_evaluations": 2,
+      "seconds": 455.1
+    },
+    "14:512:128": {
+      "log_n": 14,
+      "secret": 512,
+      "target": 128,
+      "logq": 415,
+      "status": "boundary",
+      "security_bits": "128.1262982122052114477683973883822952102",
+      "binding": "TabOg/mlwe-hybrids / primal-projected-cvp",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.4012829394771329257358366109749648264",
+        "malb/lattice-estimator / usvp": "132.5732329291718243557599152022340460878",
+        "malb/lattice-estimator / bdd": "132.4669541713466844748580069152834688918",
+        "malb/lattice-estimator / bdd_hybrid": "132.4703398553491085858198422586576803701",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "133.8233296034023724124233863151274173333",
+        "malb/lattice-estimator / dual": "133.7907706687766409219293761760300534944",
+        "malb/lattice-estimator / dual_hybrid": "132.8339512064489685291462037122296472163",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.7803549733739927090433221965054645364",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.1262982122052114477683973883822952102",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.5628985376538381097622759424707033794",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "130.1030393193320739510324745264275098683"
+      },
+      "checked_interval": [
+        413,
+        416
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 368.6
+    },
+    "14:64:128": {
+      "log_n": 14,
+      "secret": 64,
+      "target": 128,
+      "logq": 227,
+      "status": "boundary",
+      "security_bits": "128.1402049264228403101825617969066429222",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1402049264228403101825617969066429222",
+        "malb/lattice-estimator / usvp": "255.9818892348807527955384481909768454046",
+        "malb/lattice-estimator / bdd": "255.7077399853865200131963774729348403956",
+        "malb/lattice-estimator / bdd_hybrid": "155.9602471144060020686026191634187737956",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "138.9990667030261547322751533522130000945",
+        "malb/lattice-estimator / dual": "257.5234485835952425361376649365118348101",
+        "malb/lattice-estimator / dual_hybrid": "253.6502017281782400108772050328932265082",
+        "malb/lattice-estimator / dual_mitm_hybrid": "141.6314767211746072768577780865071745980",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "146.5136873416629841100430775475028108228",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "146.5302570952961870988379462565744051348",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.3449234972480862932376885293737681764"
+      },
+      "checked_interval": [
+        225,
+        228
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 8,
+      "full_evaluations": 2,
+      "seconds": 582.5
+    },
+    "14:ternary:128": {
+      "log_n": 14,
+      "secret": "ternary",
+      "target": 128,
+      "logq": 430,
+      "status": "boundary",
+      "security_bits": "128.3732198044956648033906622315458252587",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / bdd": "128.3732198044956648033906622315458252587",
+        "malb/lattice-estimator / usvp": "128.4233885220243918167103626409488792232",
+        "malb/lattice-estimator / bdd_hybrid": "128.3801988382091928362794091904854565248",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "163.5480136642617780469159954653268349417",
+        "malb/lattice-estimator / dual": "129.3567154693518809033141732439101285845",
+        "malb/lattice-estimator / dual_hybrid": "129.2133485963585360599077010796722743561",
+        "malb/lattice-estimator / dual_mitm_hybrid": "131.9368162665415863449108898154567510045"
+      },
+      "checked_interval": [
+        428,
+        431
+      ],
+      "upper": 1024,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56"
+      },
+      "evaluations": 7,
+      "full_evaluations": 3,
+      "seconds": 126.9
+    },
+    "15:1024:128": {
+      "log_n": 15,
+      "secret": 1024,
+      "target": 128,
+      "logq": 851,
+      "status": "boundary",
+      "security_bits": "128.0532993319563280842222802857684726974",
+      "binding": "TabOg/mlwe-hybrids / primal-without-mitm",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.0532995158174027979927768635643235858",
+        "malb/lattice-estimator / usvp": "130.2739840156377370811023540709348240089",
+        "malb/lattice-estimator / bdd": "130.2636340650434518171410416134294806871",
+        "malb/lattice-estimator / bdd_hybrid": "130.2981081431305807528260692530865520309",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "132.2970012240381717877137712398419154288",
+        "malb/lattice-estimator / dual": "131.5939459067101533235908853313167140788",
+        "malb/lattice-estimator / dual_hybrid": "131.0210224329496643588834495132798109918",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.7728199544346347814207055792854487013",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.0532993319563280842222802857684726974",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "129.0603622570086204977281988642730091299",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.3352741598513837439057488671096078881"
+      },
+      "checked_interval": [
+        849,
+        852
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 961.9
+    },
+    "15:128:128": {
+      "log_n": 15,
+      "secret": 128,
+      "target": 128,
+      "logq": 665,
+      "status": "boundary",
+      "security_bits": "128.1215454762052776874147926450596641083",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1215454762052776874147926450596641083",
+        "malb/lattice-estimator / usvp": "169.3986019108234812297197726244245736458",
+        "malb/lattice-estimator / bdd": "169.1680857815567645689249563077602940628",
+        "malb/lattice-estimator / bdd_hybrid": "151.8007959413270775864965648240771554797",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "140.6851425818939644136914726881868907131",
+        "malb/lattice-estimator / dual": "170.4253166008607223177207760355249454545",
+        "malb/lattice-estimator / dual_hybrid": "169.7184048466150836725786784878368549762",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.0307422951213140704373070043880720382",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "139.7481794482557996455671454183765903069",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "139.7560879706991933391067501293016465579",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "130.4223877966903569591800195229160299372"
+      },
+      "checked_interval": [
+        663,
+        666
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 7,
+      "full_evaluations": 2,
+      "seconds": 1638.9
+    },
+    "15:192:128": {
+      "log_n": 15,
+      "secret": 192,
+      "target": 128,
+      "logq": 737,
+      "status": "boundary",
+      "security_bits": "128.2498754376274943552280305636738059073",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.2498754376274943552280305636738059073",
+        "malb/lattice-estimator / usvp": "151.6088083861383524383302619065619577792",
+        "malb/lattice-estimator / bdd": "151.4139024019400434765749354814415063361",
+        "malb/lattice-estimator / bdd_hybrid": "145.1333105575768556381234982702043086479",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "138.7242903827850839066817673430029712936",
+        "malb/lattice-estimator / dual": "152.6469212095308605881192039632145745724",
+        "malb/lattice-estimator / dual_hybrid": "152.2280962449358082085097296324835551746",
+        "malb/lattice-estimator / dual_mitm_hybrid": "140.8032056065638694561321420265067746857",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "134.5644518448278416948078635028736428318",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "134.5644511352919040813320061939958959027",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.2747768624074265153605552209258686500"
+      },
+      "checked_interval": [
+        735,
+        738
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 15,
+      "full_evaluations": 2,
+      "seconds": 3711.8
+    },
+    "15:2048:128": {
+      "log_n": 15,
+      "secret": 2048,
+      "target": 128,
+      "logq": 861,
+      "status": "boundary",
+      "security_bits": "128.0700738565951002289751337241268417068",
+      "binding": "TabOg/mlwe-hybrids / primal-without-mitm",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.0700738565951002289751337241268417068",
+        "malb/lattice-estimator / usvp": "128.8653526381882217914717171481440369482",
+        "malb/lattice-estimator / bdd": "128.8626662727677488148826486669580354950",
+        "malb/lattice-estimator / bdd_hybrid": "128.9143424982854674275377340138723553638",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "132.5335168821393476769574436872254103458",
+        "malb/lattice-estimator / dual": "130.0263729232343669767529107200856341822",
+        "malb/lattice-estimator / dual_hybrid": "129.7394470063826456086029830210119707930",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.7959547630203677396205057979257898936",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.0700739511614031244376159526823853776",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "130.1786852770572142734621820016823220478",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "130.1802707505590585586932076679713587580"
+      },
+      "checked_interval": [
+        859,
+        862
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 1327.4
+    },
+    "15:256:128": {
+      "log_n": 15,
+      "secret": 256,
+      "target": 128,
+      "logq": 771,
+      "status": "boundary",
+      "security_bits": "128.0411827326878641325375168010045046247",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0411827326878641325375168010045046247",
+        "malb/lattice-estimator / usvp": "144.4107199088525983052637574026793787020",
+        "malb/lattice-estimator / bdd": "144.4018228490926357356702679757631735638",
+        "malb/lattice-estimator / bdd_hybrid": "141.3272823412664741611513132932688015400",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "137.4595579389104611551041540019120972120",
+        "malb/lattice-estimator / dual": "145.7725751031010754983839285159958608676",
+        "malb/lattice-estimator / dual_hybrid": "145.1998106732422935723408278236470354040",
+        "malb/lattice-estimator / dual_mitm_hybrid": "137.7276041197255762084980739236120403036",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "132.6686865822736894912105146633526822865",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "132.6686862069003820208941610727886588579",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.0197768446246169517642339847421235342"
+      },
+      "checked_interval": [
+        769,
+        772
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 1416.3
+    },
+    "15:32:128": {
+      "log_n": 15,
+      "secret": 32,
+      "target": 128,
+      "logq": 162,
+      "status": "boundary",
+      "security_bits": "128.0224526923846309022847307785095196608",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0224526923846309022847307785095196608",
+        "malb/lattice-estimator / usvp": "Infinity",
+        "malb/lattice-estimator / bdd": "Infinity",
+        "malb/lattice-estimator / bdd_hybrid": "156.3038856877234078915653328112665139944",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "137.9560479237263063145500528109896315843",
+        "malb/lattice-estimator / dual": "Infinity",
+        "malb/lattice-estimator / dual_hybrid": "Infinity",
+        "malb/lattice-estimator / dual_mitm_hybrid": "130.2128434645969905768423794961270625520",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "155.2185329674001172858161536291677427803",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "153.9926774620365977184592010517579920745",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "133.3270064027665352569708259840429918780"
+      },
+      "checked_interval": [
+        160,
+        163
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 7,
+      "full_evaluations": 2,
+      "seconds": 976.6
+    },
+    "15:512:128": {
+      "log_n": 15,
+      "secret": 512,
+      "target": 128,
+      "logq": 826,
+      "status": "boundary",
+      "security_bits": "128.2343003448550574076290418991855705360",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.2343003448550574076290418991855705360",
+        "malb/lattice-estimator / usvp": "134.4090006551157928085758371727289090163",
+        "malb/lattice-estimator / bdd": "134.4034247769384533817456839710357331555",
+        "malb/lattice-estimator / bdd_hybrid": "134.2886283711221469446452989828715175509",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "133.8098757161117879232751767738976996794",
+        "malb/lattice-estimator / dual": "135.4578485485577069315858776885572520369",
+        "malb/lattice-estimator / dual_hybrid": "135.1724940025419815031406286411827098898",
+        "malb/lattice-estimator / dual_mitm_hybrid": "136.2953018390310733508188294618923322038",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "129.1535888853558026343569960085373448276",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "129.1559085241262812901410585205470937035",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.0003915333697555767574652372922132464"
+      },
+      "checked_interval": [
+        824,
+        827
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 1927.6
+    },
+    "15:64:128": {
+      "log_n": 15,
+      "secret": 64,
+      "target": 128,
+      "logq": 464,
+      "status": "boundary",
+      "security_bits": "128.0986760774708436548317384213004175068",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0986760774708436548317384213004175068",
+        "malb/lattice-estimator / usvp": "252.8261072752333608557164109001011175670",
+        "malb/lattice-estimator / bdd": "252.6232152162001781549512963110114438285",
+        "malb/lattice-estimator / bdd_hybrid": "156.7945565565536626287901935398329329235",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "139.8767897253228272144523021811925446978",
+        "malb/lattice-estimator / dual": "254.1727252897891031912314260870732000815",
+        "malb/lattice-estimator / dual_hybrid": "252.3158754495981945909551827409487309289",
+        "malb/lattice-estimator / dual_mitm_hybrid": "138.8517812042362226697266544125839584644",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "146.0845529590006964730088167445064589845",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "146.0858213159525705708355118757744969560",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.4040517216581785560906496465775908483"
+      },
+      "checked_interval": [
+        462,
+        465
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 911.6
+    },
+    "15:ternary:128": {
+      "log_n": 15,
+      "secret": "ternary",
+      "target": 128,
+      "logq": 868,
+      "status": "boundary",
+      "security_bits": "128.0335807182241685178116379864638214190",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / bdd": "128.0335807182241685178116379864638214190",
+        "malb/lattice-estimator / usvp": "128.0388355770353918876179243523755985675",
+        "malb/lattice-estimator / bdd_hybrid": "128.0858145953860400982793920288087849319",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "166.7419919480876076190288954182915214909",
+        "malb/lattice-estimator / dual": "129.1661249659684270466236373007546695811",
+        "malb/lattice-estimator / dual_hybrid": "129.1652255875777505658096528501597951580",
+        "malb/lattice-estimator / dual_mitm_hybrid": "130.3168726424171644534064968390072669394"
+      },
+      "checked_interval": [
+        866,
+        869
+      ],
+      "upper": 2048,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 563.1
+    },
+    "16:1024:128": {
+      "log_n": 16,
+      "secret": 1024,
+      "target": 128,
+      "logq": 1707,
+      "status": "boundary",
+      "security_bits": "128.2161107285435396217275305924463715531",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.2161107285435396217275305924463715531",
+        "malb/lattice-estimator / usvp": "130.9849717996660886875782126224276635305",
+        "malb/lattice-estimator / bdd": "130.9817377056859336452869966272950120147",
+        "malb/lattice-estimator / bdd_hybrid": "131.0269379129247920941196397975310201087",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "131.4666902413297549316384020255256157784",
+        "malb/lattice-estimator / dual": "131.8626388150318917409793257688270245923",
+        "malb/lattice-estimator / dual_hybrid": "131.6826698430287934734085385907349733486",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.4484356367364844006993943222298503811",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.5048901938213893150260031747465741444",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.5048900429706989325632695977191359538",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "128.3590491250271288056453860650852961580"
+      },
+      "checked_interval": [
+        1705,
+        1708
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 2812.1
+    },
+    "16:128:128": {
+      "log_n": 16,
+      "secret": 128,
+      "target": 128,
+      "logq": 1345,
+      "status": "boundary",
+      "security_bits": "128.0188634946423635298692213686033737054",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0188634946423635298692213686033737054",
+        "malb/lattice-estimator / usvp": "168.7344982442493681813298190581571298877",
+        "malb/lattice-estimator / bdd": "168.5066738453785424809201712472872182013",
+        "malb/lattice-estimator / bdd_hybrid": "152.4810106132583142280236995420984411209",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "141.4403243169384098160669060767682705934",
+        "malb/lattice-estimator / dual": "169.7994261340950338163111794462974506407",
+        "malb/lattice-estimator / dual_hybrid": "169.2271308869625639351821514128475211157",
+        "malb/lattice-estimator / dual_mitm_hybrid": "138.8998021457603766582871180959941709475",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "139.9115346385856820834950749524809918566",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "139.8963362864282278273377565029343305985",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.8414528524520483200569635299899234306"
+      },
+      "checked_interval": [
+        1343,
+        1346
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 9,
+      "full_evaluations": 2,
+      "seconds": 3467.3
+    },
+    "16:192:128": {
+      "log_n": 16,
+      "secret": 192,
+      "target": 128,
+      "logq": 1475,
+      "status": "boundary",
+      "security_bits": "128.1068674339372524521806112547704859486",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1068674339372524521806112547704859486",
+        "malb/lattice-estimator / usvp": "152.6366339435674571371781419935949987774",
+        "malb/lattice-estimator / bdd": "152.6316638771903418277268747818364898274",
+        "malb/lattice-estimator / bdd_hybrid": "146.6312034378956648025537093891167124823",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "139.9801459955145020274473135855827454578",
+        "malb/lattice-estimator / dual": "153.5965003595116138368992086661623184602",
+        "malb/lattice-estimator / dual_hybrid": "153.3115419105884028372037161674727100225",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.0207897816959575857268135064913216214",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "135.4767419434030729029708240717577315897",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "135.4772955651931276607309532875595147940",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.5088906568776826489741819432846475276"
+      },
+      "checked_interval": [
+        1473,
+        1476
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 13,
+      "full_evaluations": 2,
+      "seconds": 3684.5
+    },
+    "16:2048:128": {
+      "log_n": 16,
+      "secret": 2048,
+      "target": 128,
+      "logq": 1730,
+      "status": "boundary",
+      "security_bits": "128.2433754108243218778814452581676423834",
+      "binding": "TabOg/mlwe-hybrids / primal-without-mitm",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.2433754121985912607209406979897835631",
+        "malb/lattice-estimator / usvp": "129.3072641908333506328763639350229228259",
+        "malb/lattice-estimator / bdd": "129.3051063213724541701743033332146497436",
+        "malb/lattice-estimator / bdd_hybrid": "129.3656146269706809926089681213018561080",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "129.6441407958203257701462225767448679372",
+        "malb/lattice-estimator / dual": "130.2012064814176924856907837902664402909",
+        "malb/lattice-estimator / dual_hybrid": "130.1096087632619767145555756345070203715",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.5020171860784950856343854938808856287",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.2433754108243218778814452581676423834",
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.6122633383898556644196465762021453127",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "128.8028096740227577075548239362603516613"
+      },
+      "checked_interval": [
+        1728,
+        1731
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 11,
+      "full_evaluations": 2,
+      "seconds": 2776.1
+    },
+    "16:256:128": {
+      "log_n": 16,
+      "secret": 256,
+      "target": 128,
+      "logq": 1545,
+      "status": "boundary",
+      "security_bits": "128.2652554524795184244055030161739866400",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.2652554524795184244055030161739866400",
+        "malb/lattice-estimator / usvp": "145.3973992458355215689064703314517392281",
+        "malb/lattice-estimator / bdd": "145.3948889962360735410545339482939514519",
+        "malb/lattice-estimator / bdd_hybrid": "142.4467547070258183659667622712790350157",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "138.1571854583727166751613103634442308840",
+        "malb/lattice-estimator / dual": "146.4322985387482298525016090366858947661",
+        "malb/lattice-estimator / dual_hybrid": "146.1465535449026690170745308540018316367",
+        "malb/lattice-estimator / dual_mitm_hybrid": "138.4378709016922201489139525777780523494",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "133.2984557301134607017709732634287991212",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "133.2988858672817211179440820417409083540",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.1708065885118812639571020525822410984"
+      },
+      "checked_interval": [
+        1543,
+        1546
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 11,
+      "full_evaluations": 2,
+      "seconds": 3795.5
+    },
+    "16:32:128": {
+      "log_n": 16,
+      "secret": 32,
+      "target": 128,
+      "logq": 342,
+      "status": "boundary",
+      "security_bits": "128.1435642664370695885597727330393062778",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1435642664370695885597727330393062778",
+        "malb/lattice-estimator / usvp": "Infinity",
+        "malb/lattice-estimator / bdd": "Infinity",
+        "malb/lattice-estimator / bdd_hybrid": "158.5741793139490338312643236511759491972",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "139.3181442688700354572459397548713527147",
+        "malb/lattice-estimator / dual": "Infinity",
+        "malb/lattice-estimator / dual_hybrid": "Infinity",
+        "malb/lattice-estimator / dual_mitm_hybrid": "130.2398926487774215991853316412268636565",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "160.7765672639635227464622825393341509726",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "157.5126737831891005692235655462007043896",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "134.0370776076250261092451243947598447183"
+      },
+      "checked_interval": [
+        340,
+        343
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 1606.7
+    },
+    "16:512:128": {
+      "log_n": 16,
+      "secret": 512,
+      "target": 128,
+      "logq": 1651,
+      "status": "boundary",
+      "security_bits": "128.1716012778968383719013193102110901771",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1716012778968383719013193102110901771",
+        "malb/lattice-estimator / usvp": "135.6798552861457635205225607409421589518",
+        "malb/lattice-estimator / bdd": "135.4746685446814863624736094258153681851",
+        "malb/lattice-estimator / bdd_hybrid": "135.0571008234128856344034229627005002102",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "134.2112629007120329354033072952824756277",
+        "malb/lattice-estimator / dual": "136.5748178822023136532651035359710193504",
+        "malb/lattice-estimator / dual_hybrid": "136.4069398624363936195285711085737567135",
+        "malb/lattice-estimator / dual_mitm_hybrid": "136.9802746009252554599848422843842808111",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "130.1360785290167102347144294515667509819",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "129.8978938123922893762051529806184843506",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "128.7488860536408589994779569499541979165"
+      },
+      "checked_interval": [
+        1649,
+        1652
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 2599.8
+    },
+    "16:64:128": {
+      "log_n": 16,
+      "secret": 64,
+      "target": 128,
+      "logq": 954,
+      "status": "boundary",
+      "security_bits": "128.0273583399815537889157705314103747170",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0273583399815537889157705314103747170",
+        "malb/lattice-estimator / usvp": "247.1334619346649673931542109932726708254",
+        "malb/lattice-estimator / bdd": "247.1296797449871689647353694648932708593",
+        "malb/lattice-estimator / bdd_hybrid": "157.0166228944405478217770864036579239583",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "140.8077334971655007037784508766935356639",
+        "malb/lattice-estimator / dual": "248.3658652262687298130594489972253494762",
+        "malb/lattice-estimator / dual_hybrid": "247.3637540641190214831495406462100945832",
+        "malb/lattice-estimator / dual_mitm_hybrid": "137.4147340533215557839668452065191306436",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "145.2806929558842570472176754428716497075",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "145.2851407454978695462459105765703346746",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.3347838047494117711461747450128963234"
+      },
+      "checked_interval": [
+        952,
+        955
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 7,
+      "full_evaluations": 2,
+      "seconds": 2148.9
+    },
+    "16:ternary:128": {
+      "log_n": 16,
+      "secret": "ternary",
+      "target": 128,
+      "logq": 1746,
+      "status": "boundary",
+      "security_bits": "128.2053778840710169399143070117961509854",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / bdd": "128.2053778840710169399143070117961509854",
+        "malb/lattice-estimator / usvp": "128.2078952589423021394841035642343038578",
+        "malb/lattice-estimator / bdd_hybrid": "128.2591556643204673572665685321803482887",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "128.5376523265578238635151646657169719289",
+        "malb/lattice-estimator / dual": "129.0946812886795139918480960301086429781",
+        "malb/lattice-estimator / dual_hybrid": "129.2498210654277608864388592086248236885",
+        "malb/lattice-estimator / dual_mitm_hybrid": "129.8246026441113230650115086228813218694"
+      },
+      "checked_interval": [
+        1744,
+        1747
+      ],
+      "upper": 4096,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56"
+      },
+      "evaluations": 8,
+      "full_evaluations": 3,
+      "seconds": 670.3
+    },
+    "17:1024:128": {
+      "log_n": 17,
+      "secret": 1024,
+      "target": 128,
+      "logq": 3423,
+      "status": "boundary",
+      "security_bits": "128.1085876685939200263299623816998554560",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1085876685939200263299623816998554560",
+        "malb/lattice-estimator / usvp": "131.7045051712319783722500500538653665038",
+        "malb/lattice-estimator / bdd": "131.7031191863685056450091426957885403234",
+        "malb/lattice-estimator / bdd_hybrid": "131.4715797248113913198327314817816979806",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "131.6366764570925288782867920430915774043",
+        "malb/lattice-estimator / dual": "132.3101241010445949935084676698861395857",
+        "malb/lattice-estimator / dual_hybrid": "132.6318851803974250187747389698743061088",
+        "malb/lattice-estimator / dual_mitm_hybrid": "1038.410655480753684791249158434057468546",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.9526627693131689777482542724897210196",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.9526627449056034562827158492169466337",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "128.6676590620085354981956833671256787877"
+      },
+      "checked_interval": [
+        3421,
+        3424
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 4237.9
+    },
+    "17:128:128": {
+      "log_n": 17,
+      "secret": 128,
+      "target": 128,
+      "logq": 2721,
+      "status": "boundary",
+      "security_bits": "128.0192481765587776309525000248566709029",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0192481765587776309525000248566709029",
+        "malb/lattice-estimator / usvp": "167.7993836813645782644031263616647199540",
+        "malb/lattice-estimator / bdd": "167.7978416435265590406560140927709654404",
+        "malb/lattice-estimator / bdd_hybrid": "153.2121416214638608359139397047618920389",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "142.3945979060718570026570735213864802982",
+        "malb/lattice-estimator / dual": "168.6817416531622402615603438803679940295",
+        "malb/lattice-estimator / dual_hybrid": "168.4543545261977864552652690811211568751",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.2947344714973198102421230186425614363",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "140.9620546990640541006626338999866128387",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "140.9410548748772142616937225778281459954",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.7886810455079635217267572705843856679"
+      },
+      "checked_interval": [
+        2719,
+        2722
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 5,
+      "full_evaluations": 2,
+      "seconds": 3486.1
+    },
+    "17:192:128": {
+      "log_n": 17,
+      "secret": 192,
+      "target": 128,
+      "logq": 2982,
+      "status": "boundary",
+      "security_bits": "128.1064348699660420652695724862657425918",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1064348699660420652695724862657425918",
+        "malb/lattice-estimator / usvp": "151.9924427910674564947191170867945553148",
+        "malb/lattice-estimator / bdd": "151.9856191546135408508113464847404359331",
+        "malb/lattice-estimator / bdd_hybrid": "146.9166172319688266351256396377588368759",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "140.4051062971648775511001699897108111910",
+        "malb/lattice-estimator / dual": "152.8391089080349160169448229967058169836",
+        "malb/lattice-estimator / dual_hybrid": "152.9687999464779212268731849670841542785",
+        "malb/lattice-estimator / dual_mitm_hybrid": "140.4173808423292892551128127633019526794",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "134.6398684066857695640551813814503834048",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "134.6399594542764172111529399590526610936",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.0690563794791549447249786050939994878"
+      },
+      "checked_interval": [
+        2980,
+        2983
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 9,
+      "full_evaluations": 2,
+      "seconds": 4101.1
+    },
+    "17:2048:128": {
+      "log_n": 17,
+      "secret": 2048,
+      "target": 128,
+      "logq": 3480,
+      "status": "boundary",
+      "security_bits": "128.1315854287247046159895412014158244661",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1315854287247046159895412014158244661",
+        "malb/lattice-estimator / usvp": "129.4907261343599727420753503171169260021",
+        "malb/lattice-estimator / bdd": "129.4892656148846869056888706503331392431",
+        "malb/lattice-estimator / bdd_hybrid": "130.2558041800380425447800657013261287051",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "130.2621210084060985968846814736280674330",
+        "malb/lattice-estimator / dual": "130.0938178982964456479076036357872035198",
+        "malb/lattice-estimator / dual_hybrid": "130.4827077783164714274486523401701318548",
+        "malb/lattice-estimator / dual_mitm_hybrid": "135.0855905109018097135978148859839660080",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "128.1472411689422663593930398258712837719",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "128.1472882890953750020645858180441921644",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "128.4109913507505900867374876345010165060"
+      },
+      "checked_interval": [
+        3478,
+        3481
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 18,
+      "full_evaluations": 2,
+      "seconds": 17549.3
+    },
+    "17:256:128": {
+      "log_n": 17,
+      "secret": 256,
+      "target": 128,
+      "logq": 3101,
+      "status": "boundary",
+      "security_bits": "128.1763998803674034872598144077447798030",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.1763998803674034872598144077447798030",
+        "malb/lattice-estimator / usvp": "145.8667539889414071112109273392002266282",
+        "malb/lattice-estimator / bdd": "145.8641029593371222789620018150714549710",
+        "malb/lattice-estimator / bdd_hybrid": "143.2079220279297228365713206485230574388",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "139.0667222783016395738968791756518753763",
+        "malb/lattice-estimator / dual": "146.4526061934708903842156356281667722321",
+        "malb/lattice-estimator / dual_hybrid": "146.8079443559095380621184360690830509643",
+        "malb/lattice-estimator / dual_mitm_hybrid": "139.6054115038249223548016741704908232088",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "133.4081555566886140223389874623834781285",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "133.6564250284942935159997883214946416525",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "129.5391690863536928343451432209324909013"
+      },
+      "checked_interval": [
+        3099,
+        3102
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 17,
+      "full_evaluations": 2,
+      "seconds": 11506.3
+    },
+    "17:32:128": {
+      "log_n": 17,
+      "secret": 32,
+      "target": 128,
+      "logq": 744,
+      "status": "boundary",
+      "security_bits": "128.0048080029726101249282074465628154074",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0048080029726101249282074465628154074",
+        "malb/lattice-estimator / usvp": "Infinity",
+        "malb/lattice-estimator / bdd": "Infinity",
+        "malb/lattice-estimator / bdd_hybrid": "156.0423132919834001834070511233657780034",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "139.7214318107513852878921496216890278117",
+        "malb/lattice-estimator / dual": "Infinity",
+        "malb/lattice-estimator / dual_hybrid": "Infinity",
+        "malb/lattice-estimator / dual_mitm_hybrid": "163.3063823600185409198570950478168341534",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "152.6458706082690422981209394106218664298",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "157.8566925086012475279729549432636654298",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "133.0283632466968140362005272217762125977"
+      },
+      "checked_interval": [
+        742,
+        745
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 10,
+      "full_evaluations": 2,
+      "seconds": 5340.7
+    },
+    "17:512:128": {
+      "log_n": 17,
+      "secret": 512,
+      "target": 128,
+      "logq": 3315,
+      "status": "boundary",
+      "security_bits": "128.0643839435034038110548843786771299473",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0643839435034038110548843786771299473",
+        "malb/lattice-estimator / usvp": "136.1375162055143984477387395945243036736",
+        "malb/lattice-estimator / bdd": "136.1362019919682350713434282695281770216",
+        "malb/lattice-estimator / bdd_hybrid": "135.6551351211083094434875415694499053846",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "134.4164483631336018646461786841629616711",
+        "malb/lattice-estimator / dual": "136.7446291919099633757929367866582664866",
+        "malb/lattice-estimator / dual_hybrid": "137.0698271784061913268517057214445762905",
+        "malb/lattice-estimator / dual_mitm_hybrid": "137.0482657496501799284668168200334297630",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "130.5859036294330388329086119933823024611",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "130.5859036292614533343085995723037955085",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "128.9012486224964895465947956805722340894"
+      },
+      "checked_interval": [
+        3313,
+        3316
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 17,
+      "full_evaluations": 2,
+      "seconds": 11447.8
+    },
+    "17:64:128": {
+      "log_n": 17,
+      "secret": 64,
+      "target": 128,
+      "logq": 1963,
+      "status": "boundary",
+      "security_bits": "128.0013132240789433177765838769042720725",
+      "binding": "TabOg/mlwe-hybrids / primal-mitm-square-root",
+      "costs": {
+        "TabOg/mlwe-hybrids / primal-mitm-square-root": "128.0013132240789433177765838769042720725",
+        "malb/lattice-estimator / usvp": "240.8748707716119882612569016304505244708",
+        "malb/lattice-estimator / bdd": "240.8718924997499229339883812791254712808",
+        "malb/lattice-estimator / bdd_hybrid": "157.3282381327049344652003775161761116756",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "141.7579490126145089324941294803592819272",
+        "malb/lattice-estimator / dual": "241.8382021145044688467043428951518395703",
+        "malb/lattice-estimator / dual_hybrid": "241.5524915624560704325376827918566646965",
+        "malb/lattice-estimator / dual_mitm_hybrid": "136.7276838753024781039009957895920128261",
+        "TabOg/mlwe-hybrids / primal-projected-cvp": "150.1995086983863997176642884347259908017",
+        "TabOg/mlwe-hybrids / primal-without-mitm": "150.2067012864935086264242614611744882389",
+        "TabOg/mlwe-hybrids / primal-mitm-estimator": "131.5234690686065724033481195746113017194"
+      },
+      "checked_interval": [
+        1961,
+        1964
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee"
+      },
+      "evaluations": 7,
+      "full_evaluations": 2,
+      "seconds": 4068.1
+    },
+    "17:ternary:128": {
+      "log_n": 17,
+      "secret": "ternary",
+      "target": 128,
+      "logq": 3522,
+      "status": "boundary",
+      "security_bits": "128.0917798137585304156416383698829823573",
+      "binding": "malb/lattice-estimator / bdd",
+      "costs": {
+        "malb/lattice-estimator / bdd": "128.0917798137585304156416383698829823573",
+        "malb/lattice-estimator / usvp": "128.0928163334109369670819084879004181032",
+        "malb/lattice-estimator / bdd_hybrid": "128.1535453220194867174711043008494703347",
+        "malb/lattice-estimator / bdd_mitm_hybrid": "128.1535453220194867174711043008494703347",
+        "malb/lattice-estimator / dual": "128.4320277740099283296570543792137479014",
+        "malb/lattice-estimator / dual_hybrid": "129.0525645696750420589282017056462355121",
+        "malb/lattice-estimator / dual_mitm_hybrid": "129.3397331443460831915195838556139448633"
+      },
+      "checked_interval": [
+        3520,
+        3523
+      ],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56"
+      },
+      "evaluations": 6,
+      "full_evaluations": 2,
+      "seconds": 3481.5
+    }
+  }
+}
