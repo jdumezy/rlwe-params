@@ -13,7 +13,7 @@ class Backend(NamedTuple):
     """How to run a backend, and the pinned sources it needs, if any.
 
     command starts a program that speaks the protocol in protocol.py. "{sage}"
-    expands to the Sage command. url and revision pin sources that setup
+    expands to Sage's Python interpreter. url and revision pin sources that setup
     installs, and source is a file that identifies a checkout. applies selects
     the backend by default in plain Python. None selects it for all parameters.
     """
@@ -34,13 +34,13 @@ def _sparse_power_of_two(parameters):
 # Adding a backend takes an entry here and a program that speaks the protocol.
 BACKENDS = {
     "malb": Backend(
-        ("{sage}", "-python", "-m", "rlwe_params.adapters.malb"),
+        ("{sage}", "-m", "rlwe_params.adapters.malb"),
         url="https://github.com/malb/lattice-estimator.git",
         revision="7d59f866655362ea8eab803dbc833710c2bc362a",
         source="estimator/__init__.py",
     ),
     "tabog": Backend(
-        ("{sage}", "-python", "-m", "rlwe_params.adapters.tabog"),
+        ("{sage}", "-m", "rlwe_params.adapters.tabog"),
         url="https://github.com/TabOg/mlwe-hybrids.git",
         revision="a92f335665eef69927d2d8f49832bd595a6dac32",
         submodules=("PrimalHybrid/lattice_estimator",),

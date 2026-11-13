@@ -20,7 +20,7 @@ rlwe-params setup
 ```
 
 `setup` checks Sage and installs the pinned estimator sources.
-It uses `sage` on `PATH`, or `--sage PATH`.
+It uses `sage` on `PATH`, or `--sage PATH`, a `sage` launcher or a Python that imports Sage.
 
 Without a local Sage, use Docker.
 

@@ -137,7 +137,7 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command", required=True)
     setup_parser = commands.add_parser("setup", help="Install backend sources for a Sage runtime.")
     setup_parser.add_argument("backends", nargs="*", metavar="BACKEND", default=list(BACKENDS))
-    setup_parser.add_argument("--sage", help="Use this Sage executable. Default: sage on PATH.")
+    setup_parser.add_argument("--sage", help="Use this sage launcher, or a Python that imports Sage. Default: sage on PATH.")
 
     query = commands.add_parser("estimate", help="Estimate security for RLWE parameters.")
     _parameters(query)

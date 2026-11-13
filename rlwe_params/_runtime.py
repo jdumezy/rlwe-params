@@ -2,6 +2,7 @@
 
 import atexit
 from contextlib import contextmanager
+from functools import lru_cache
 import json
 import os
 from pathlib import Path
@@ -20,33 +21,45 @@ from .protocol import canonical, raise_error
 _PACKAGE_ROOT = str(Path(__file__).resolve().parent.parent)
 
 
-def sage_command(sage=None):
-    """The command that starts Sage, for backends that need it."""
+@lru_cache(maxsize=None)
+def _interpreter(executable):
+    resolved = shutil.which(str(executable))
+    if not resolved:
+        raise RuntimeError(f"Sage executable not found: {executable}.")
+    # Both the sage launcher and Sage's Python accept -c, unlike sage -python.
+    process = subprocess.run([resolved, "-c", "import sys, sage.all; print(sys.executable)"],
+                             capture_output=True, text=True)
+    lines = process.stdout.strip().splitlines()
+    if process.returncode or not lines or not Path(lines[-1]).is_file():
+        raise RuntimeError(f"{resolved} cannot import Sage: {process.stderr.strip()}")
+    return lines[-1]
+
+
+def sage_python(sage=None):
+    """The Python interpreter of Sage, for backends that need it.
+
+    sage, or $RLWE_PARAMS_SAGE, is a sage launcher or a Python that imports
+    Sage. Otherwise use the interpreter recorded by setup, or sage on PATH.
+    """
     executable = sage or os.environ.get("RLWE_PARAMS_SAGE")
     if executable:
-        resolved = shutil.which(str(executable))
-        if not resolved:
-            raise RuntimeError(f"Sage executable not found: {executable}.")
-        return (resolved,)
+        return _interpreter(executable)
     configuration = backends_root() / "runtime.json"
     if configuration.is_file():
-        command = json.loads(configuration.read_text())["command"]
-        if not isinstance(command, list) or not command or not all(isinstance(s, str) for s in command):
-            raise ValueError("Invalid backend runtime command.")
-        return tuple(command)
-    executable = shutil.which("sage")
-    if executable:
-        return (executable,)
+        python = json.loads(configuration.read_text()).get("python")
+        if not isinstance(python, str) or not python:
+            raise RuntimeError(f"Invalid {configuration}. Rerun rlwe-params setup.")
+        return python
+    if shutil.which("sage"):
+        return _interpreter("sage")
     raise RuntimeError("SageMath was not found. Install it, pass --sage PATH, "
                        "or use the Docker image.")
 
 
 def backend_command(name, sage=None):
     """The command that runs a registered backend, with "{sage}" expanded."""
-    command = []
-    for argument in BACKENDS[name].command:
-        command.extend(sage_command(sage) if argument == "{sage}" else [argument])
-    return tuple(command)
+    return tuple(sage_python(sage) if argument == "{sage}" else argument
+                 for argument in BACKENDS[name].command)
 
 
 class Worker:

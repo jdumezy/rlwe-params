@@ -11,10 +11,10 @@ The plain tests need only Python.
 python3 -m unittest discover -s tests
 ```
 
-The backend tests also need Sage and the sources installed by `rlwe-params setup`.
+The backend tests also need Sage and the sources installed by `rlwe-params setup`, and run under Sage's Python.
 
 ```bash
-RLWE_PARAMS_TEST_SAGE=1 sage -python -m unittest discover -s tests
+RLWE_PARAMS_TEST_SAGE=1 "$(sage -c 'import sys; print(sys.executable)')" -m unittest discover -s tests
 ```
 
 Or, with Docker only:
@@ -76,7 +76,7 @@ The adapter file is part of the backend revision, so cached results are invalida
 
    For a Python estimator, write a class and call `serve()` from `rlwe_params.protocol`, as the adapters in [`rlwe_params/adapters/`](rlwe_params/adapters/) do.
 2. Register it in `BACKENDS` in [`rlwe_params/installation.py`](rlwe_params/installation.py).
-   `command` starts it, where `"{sage}"` expands to the Sage command.
+   `command` starts it, where `"{sage}"` expands to Sage's Python interpreter.
    Optionally pin sources that `rlwe-params setup` installs, with `url`, `revision`, and `source`, a file that identifies a checkout.
    `applies` is an optional plain-Python test of the parameters it handles.
 3. Add tests: for a Python adapter, compare its costs with direct upstream calls, as in [`tests/test_tabog.py`](tests/test_tabog.py).
