@@ -15,14 +15,16 @@ Sparse binary secrets with Hamming weight `h`:
 
 | logn \ h | 32 | 64 | 128 | 192 | 256 | 512 | 1024 | 2048 |
 | -------- | --: | --: | --: | --: | --: | --: | --: | --: |
-| 12 |  | 53 | 82 | 93 | 99 | 103 | 105 | 105 |
+| 12 | err\* | 53 | 82 | 93 | 99 | 103 | 105 | 105 |
 | 13 | 31 | 106 | 161 | 182 | 193 | 206 | 212 | 213 |
 | 14 | 67 | 216 | 323 | 361 | 381 | 413 | 423 | 427 |
 | 15 | 146 | 446 | 653 | 726 | 761 | 821 | 849 | 860 |
 | 16 | 321 | 923 | 1323 | 1460 | 1529 | 1643 | 1702 | 1728 |
-| 17 |  | 1909 | 2683 | 2956 | 3081 | 3304 | 3414 | 3477 |
+| 17 | err\* | 1909 | 2683 | 2956 | 3081 | 3304 | 3414 | 3477 |
 
 Each cell is the largest `logq`, with `q = 2^logq` the largest attacked modulus, such that every attack of the estimators below costs at least 128 bits at that `logq`, and the next `logq` has an attack below 128 bits. Integer `logq` from 15 to the upper bound were searched. `--`: the lower bound already fails. `>=U`: the upper bound `U` meets the target. Empty: not computed.
+
+\* An estimator failed on this cell, so it has no result. Its error is in `results.json`.
 
 - Ring dimension `n = 2^logn`. Error: discrete Gaussian, `sigma = 3.2`. Samples: unlimited.
 - Sparse ternary: `h` coefficients in {-1, 1}, `h // 2` of them equal to 1, the rest 0.
@@ -31,5 +33,7 @@ Each cell is the largest `logq`, with `q = 2^logq` the largest attacked modulus,
 - `binary`: uniform on {0, 1}.
 - `gaussian`: discrete Gaussian with `sigma = 3.2`, like the error.
 - Profile `matzov`: cost model MATZOV, shape model GSA, backends malb, tabog.
+- `TabOg/mlwe-hybrids` revision `tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:44349ab495b40eb3f64ad3f64570de55db76133348bebc55c1ae5c2cd67974aa`.
 - `TabOg/mlwe-hybrids` revision `tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee`.
 - `malb/lattice-estimator` revision `sha256:780c700c4839a95a4243d676f164400fd2523bef76895b961cede79d5230fb56`.
+- `malb/lattice-estimator` revision `sha256:cf2ea8801004d69acbd9ce992df1460d5477cba76ea50c020c6aeb992b7b0343`.

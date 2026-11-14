@@ -460,6 +460,26 @@
       "full_evaluations": 4,
       "seconds": 278.0
     },
+    "12:binary-32:128": {
+      "log_n": 12,
+      "secret": "binary-32",
+      "target": 128,
+      "logq": null,
+      "status": "error",
+      "error": "malb attack bdd failed: Incorrect bounds 4096 > 1778.",
+      "security_bits": null,
+      "binding": null,
+      "costs": {},
+      "checked_interval": [],
+      "upper": 256,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:cf2ea8801004d69acbd9ce992df1460d5477cba76ea50c020c6aeb992b7b0343",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:44349ab495b40eb3f64ad3f64570de55db76133348bebc55c1ae5c2cd67974aa"
+      },
+      "evaluations": 14,
+      "full_evaluations": 3,
+      "seconds": 178.8
+    },
     "12:binary-512:128": {
       "log_n": 12,
       "secret": "binary-512",
@@ -3580,6 +3600,26 @@
       "evaluations": 14,
       "full_evaluations": 2,
       "seconds": 14694.7
+    },
+    "17:binary-32:128": {
+      "log_n": 17,
+      "secret": "binary-32",
+      "target": 128,
+      "logq": null,
+      "status": "error",
+      "error": "malb attack dual_mitm_hybrid failed: \u03b2 = 487 > d = 367",
+      "security_bits": null,
+      "binding": null,
+      "costs": {},
+      "checked_interval": [],
+      "upper": 8192,
+      "revisions": {
+        "malb/lattice-estimator": "sha256:cf2ea8801004d69acbd9ce992df1460d5477cba76ea50c020c6aeb992b7b0343",
+        "TabOg/mlwe-hybrids": "tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:44349ab495b40eb3f64ad3f64570de55db76133348bebc55c1ae5c2cd67974aa"
+      },
+      "evaluations": 3,
+      "full_evaluations": 1,
+      "seconds": 103.1
     },
     "17:binary-512:128": {
       "log_n": 17,
