@@ -94,8 +94,9 @@ class TableTests(unittest.TestCase):
         self.assertEqual(stored["cells"], records)
         self.assertEqual(stored["settings"]["profile"]["cost_model"], "MATZOV")
         table = (self.output / "128bits_security.md").read_text()
-        self.assertIn("| logn \\ h | 32 | ternary |", table)
-        self.assertIn(f"| 13 | {expected(13, 32, 128)} | {expected(13, 'ternary', 128)} |", table)
+        self.assertIn(f"| logn \\ secret | ternary |\n| -------- | --: |\n"
+                      f"| 12 | {expected(12, 'ternary', 128)} |", table)
+        self.assertIn(f"| logn \\ h | 32 |\n| -------- | --: |\n| 12 | {expected(12, 32, 128)} |", table)
         self.assertIn("`curve` revision `r1`", table)
         self.assertIn("sigma = 3.2", table)
         self.assertNotIn("err", table)
@@ -122,7 +123,7 @@ class TableTests(unittest.TestCase):
         self.assertIn(("13:ternary:128", failures["13:ternary:128"]), events)
         self.assertEqual(records["14:ternary:128"]["status"], "boundary")
         table = (self.output / "128bits_security.md").read_text()
-        self.assertIn(f"| 13 | {expected(13, 32, 128)} | err\\* |", table)
+        self.assertIn(f"| 12 | {expected(12, 'ternary', 128)} |\n| 13 | err\\* |", table)
         self.assertIn("\\* An estimator failed on this cell", table)
         retried, failures, _ = self.run_grid()
         self.assertEqual((len(retried), failures), (12, {}))
@@ -135,7 +136,8 @@ class TableTests(unittest.TestCase):
         self.assertEqual((records["12:ternary:128"]["logq"], records["12:ternary:128"]["status"]),
                          (50, "upper_bound"))
         table = (self.output / "128bits_security.md").read_text()
-        self.assertIn("| 12 | -- | >=50 |", table)
+        self.assertIn("| 12 | >=50 |", table)
+        self.assertIn("| 12 | -- |", table)
         self.assertEqual(secret(64), SparseTernary(32, 32))
         self.assertEqual(SparseTernary.weight(7), SparseTernary(3, 4))
         for label in (0, "dense", 1.5):
@@ -158,11 +160,14 @@ class TableTests(unittest.TestCase):
         self.assertEqual(records["13:binary-64:128"]["logq"], expected(13, "binary-64", 128))
         self.assertEqual(records["12:gaussian:128"]["secret"], "gaussian")
         table = (self.output / "128bits_security.md").read_text()
-        # The first run's columns stay, in a fixed order, with sparse binary apart.
-        self.assertIn("| logn \\ h | 32 | ternary | binary | gaussian |", table)
-        self.assertIn(f"| 12 | {expected(12, 32, 128)} | {expected(12, 'ternary', 128)} |", table)
-        self.assertIn(f"| 13 |  |  | {expected(13, 'binary', 128)} |", table)
-        self.assertIn("Sparse binary secrets", table)
+        # The first run's columns stay, in three tables with a fixed column order.
+        self.assertIn("| logn \\ secret | ternary | binary | gaussian |", table)
+        self.assertIn(f"| 12 | {expected(12, 'ternary', 128)} | {expected(12, 'binary', 128)} |", table)
+        self.assertIn(f"| 13 |  | {expected(13, 'binary', 128)} |", table)
+        self.assertIn(f"| logn \\ h | 32 |\n| -------- | --: |\n| 12 | {expected(12, 32, 128)} |\n| 13 |  |",
+                      table)
+        self.assertLess(table.index("Ternary, binary"), table.index("Sparse ternary secrets"))
+        self.assertLess(table.index("Sparse ternary secrets"), table.index("Sparse binary secrets"))
         self.assertIn(f"| logn \\ h | 64 |\n| -------- | --: |\n| 12 | {expected(12, 'binary-64', 128)} |", table)
 
     def test_interruption_abandons_running_cells_and_starts_no_more(self):

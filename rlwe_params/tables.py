@@ -53,11 +53,11 @@ def secret(label, sigma="3.2"):
 
 
 def _order(label):
-    """Sparse ternary by weight, then dense secrets, then sparse binary by weight."""
-    if type(label) is int:
-        return 0, label
+    """Dense secrets, then sparse ternary by weight, then sparse binary by weight."""
     if label in DENSE:
-        return 1, DENSE.index(label)
+        return 0, DENSE.index(label)
+    if type(label) is int:
+        return 1, label
     return 2, _sparse_binary(label)
 
 
@@ -138,14 +138,16 @@ def _markdown(settings, records, log_ns, labels, target):
     kinds = {"sparse ternary" if type(label) is int else
              "sparse binary" if _sparse_binary(label) else label for label in labels}
     lines = [f"# Ciphertext modulus table for {target} bits of security"]
-    groups = (("Sparse ternary secrets with Hamming weight `h`, and dense secrets",
-               [label for label in labels if _order(label)[0] < 2], str),
-              ("Sparse binary secrets with Hamming weight `h`",
-               [label for label in labels if _order(label)[0] == 2], lambda label: str(_sparse_binary(label))))
-    for title, columns, name in groups:
+    groups = (("Ternary, binary, and Gaussian secrets", "secret", 0, str),
+              ("Sparse ternary secrets with Hamming weight `h`", "h", 1, str),
+              ("Sparse binary secrets with Hamming weight `h`", "h", 2,
+               lambda label: str(_sparse_binary(label))))
+    for title, header, group, name in groups:
+        columns = [label for label in labels if _order(label)[0] == group]
         if not columns:
             continue
-        lines += ["", f"{title}:", "", "| logn \\ h | " + " | ".join(name(label) for label in columns) + " |",
+        lines += ["", f"{title}:", "",
+                  f"| logn \\ {header} | " + " | ".join(name(label) for label in columns) + " |",
                   "| -------- |" + " --: |" * len(columns)]
         lines += [f"| {log_n} | " + " | ".join(_cell(records.get(_key(log_n, label, target)))
                                               for label in columns) + " |" for log_n in log_ns]
@@ -166,12 +168,12 @@ def _markdown(settings, records, log_ns, labels, target):
         f"- Ring dimension `n = 2^logn`. Error: discrete Gaussian, `sigma = {settings['sigma']}`. "
         f"Samples: {'unlimited' if settings['samples'] is None else settings['samples']}.",
         *(f"- {text}" for kind, text in (
-            ("sparse ternary", "Sparse ternary: `h` coefficients in {-1, 1}, `h // 2` of them equal to 1, "
-                               "the rest 0."),
-            ("sparse binary", "Sparse binary: `h` coefficients equal to 1, the rest 0."),
             ("ternary", "`ternary`: uniform on {-1, 0, 1}."),
             ("binary", "`binary`: uniform on {0, 1}."),
             ("gaussian", f"`gaussian`: discrete Gaussian with `sigma = {settings['sigma']}`, like the error."),
+            ("sparse ternary", "Sparse ternary: `h` coefficients in {-1, 1}, `h // 2` of them equal to 1, "
+                               "the rest 0."),
+            ("sparse binary", "Sparse binary: `h` coefficients equal to 1, the rest 0."),
         ) if kind in kinds),
         f"- Profile `{profile['name']}`: cost model {profile['cost_model']}, "
         f"shape model {profile['shape_model']}, backends {', '.join(profile['backends'])}.",

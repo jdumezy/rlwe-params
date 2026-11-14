@@ -1,15 +1,26 @@
 # Ciphertext modulus table for 128 bits of security
 
-Sparse ternary secrets with Hamming weight `h`, and dense secrets:
+Ternary, binary, and Gaussian secrets:
 
-| logn \ h | 32 | 64 | 128 | 192 | 256 | 512 | 1024 | 2048 | ternary | binary | gaussian |
-| -------- | --: | --: | --: | --: | --: | --: | --: | --: | --: | --: | --: |
-| 12 | 19 | 57 | 85 | 96 | 100 | 104 | 105 | 106 | 106 | 105 | 108 |
-| 13 | 37 | 112 | 167 | 186 | 196 | 208 | 211 | 213 | 214 | 213 | 216 |
-| 14 | 77 | 227 | 332 | 367 | 387 | 415 | 424 | 428 | 430 | 430 | 432 |
-| 15 | 162 | 464 | 665 | 737 | 771 | 826 | 851 | 861 | 868 | 867 | 870 |
-| 16 | 342 | 954 | 1345 | 1475 | 1545 | 1651 | 1707 | 1730 | 1746 | 1746 | 1748 |
-| 17 | 744 | 1963 | 2721 | 2982 | 3101 | 3315 | 3423 | 3480 | 3522 | 3521 | 3524 |
+| logn \ secret | ternary | binary | gaussian |
+| -------- | --: | --: | --: |
+| 12 | 106 | 105 | 108 |
+| 13 | 214 | 213 | 216 |
+| 14 | 430 | 430 | 432 |
+| 15 | 868 | 867 | 870 |
+| 16 | 1746 | 1746 | 1748 |
+| 17 | 3522 | 3521 | 3524 |
+
+Sparse ternary secrets with Hamming weight `h`:
+
+| logn \ h | 32 | 64 | 128 | 192 | 256 | 512 | 1024 | 2048 |
+| -------- | --: | --: | --: | --: | --: | --: | --: | --: |
+| 12 | 19 | 57 | 85 | 96 | 100 | 104 | 105 | 106 |
+| 13 | 37 | 112 | 167 | 186 | 196 | 208 | 211 | 213 |
+| 14 | 77 | 227 | 332 | 367 | 387 | 415 | 424 | 428 |
+| 15 | 162 | 464 | 665 | 737 | 771 | 826 | 851 | 861 |
+| 16 | 342 | 954 | 1345 | 1475 | 1545 | 1651 | 1707 | 1730 |
+| 17 | 744 | 1963 | 2721 | 2982 | 3101 | 3315 | 3423 | 3480 |
 
 Sparse binary secrets with Hamming weight `h`:
 
@@ -27,11 +38,11 @@ Each cell is the largest `logq`, with `q = 2^logq` the largest attacked modulus,
 \* An estimator failed on this cell, so it has no result. Its error is in `results.json`.
 
 - Ring dimension `n = 2^logn`. Error: discrete Gaussian, `sigma = 3.2`. Samples: unlimited.
-- Sparse ternary: `h` coefficients in {-1, 1}, `h // 2` of them equal to 1, the rest 0.
-- Sparse binary: `h` coefficients equal to 1, the rest 0.
 - `ternary`: uniform on {-1, 0, 1}.
 - `binary`: uniform on {0, 1}.
 - `gaussian`: discrete Gaussian with `sigma = 3.2`, like the error.
+- Sparse ternary: `h` coefficients in {-1, 1}, `h // 2` of them equal to 1, the rest 0.
+- Sparse binary: `h` coefficients equal to 1, the rest 0.
 - Profile `matzov`: cost model MATZOV, shape model GSA, backends malb, tabog.
 - `TabOg/mlwe-hybrids` revision `tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:44349ab495b40eb3f64ad3f64570de55db76133348bebc55c1ae5c2cd67974aa`.
 - `TabOg/mlwe-hybrids` revision `tabog=sha256:441e93713654ab307628a5913654059efd2e22f74fb4e18c9962c6374f68de30|malb=sha256:5931f4aefcc97da2580618512cb8b2f2569f34499506c3e3e3ded09cdd215cee`.
