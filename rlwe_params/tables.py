@@ -18,6 +18,8 @@ from .profiles import profile as _profile
 
 
 FORMAT = 1
+# Version of the exported JSON tables. Bump it on any change that breaks their readers.
+EXPORT_FORMAT = 1
 
 
 DENSE = ("ternary", "binary", "gaussian")
@@ -182,12 +184,74 @@ def _markdown(settings, records, log_ns, labels, target):
     return "\n".join(lines) + "\n"
 
 
+# Stable status names of the export, independent of the search's internal names.
+_STATUSES = {"boundary": "boundary", "lower_bound_unsafe": "below_lower",
+             "upper_bound": "at_least_upper", "error": "error"}
+
+
+def _export_secret(label, sigma):
+    value = secret(label, sigma)
+    if isinstance(value, SparseTernary):
+        kind = "sparse_binary" if _sparse_binary(label) else "sparse_ternary"
+        return {"kind": kind, "h": value.h, "ones": value.positive, "minus_ones": value.negative}
+    if isinstance(value, DiscreteGaussian):
+        return {"kind": label, "sigma": str(value.stddev)}
+    if isinstance(value, Ternary):
+        return {"kind": label, "min": -1, "max": 1}
+    return {"kind": label, "min": value.lower, "max": value.upper}
+
+
+def _export(settings, records, target):
+    """The table of one target in the documented JSON format, for other programs."""
+    stored = sorted((record for record in records.values() if record["target"] == target),
+                    key=lambda record: (_order(record["secret"]), record["log_n"]))
+    profile = settings["profile"]
+    return {
+        "format": EXPORT_FORMAT,
+        "target": target,
+        "error": {"kind": "gaussian", "sigma": settings["sigma"]},
+        "samples": settings["samples"],
+        "lower": settings["lower"],
+        "profile": {name: profile[name] for name in ("name", "cost_model", "shape_model", "backends")},
+        "cells": [{
+            "log_n": record["log_n"],
+            "secret": _export_secret(record["secret"], settings["sigma"]),
+            "status": _STATUSES[record["status"]],
+            "max_log_q": record["logq"],
+            "upper": record["upper"],
+            "security_bits": record["security_bits"],
+            "binding_attack": record["binding"],
+            **({"error": record["error"]} if record["status"] == "error" else {}),
+            "revisions": record["revisions"],
+        } for record in stored],
+    }
+
+
+def _save_tables(output, settings, records, log_ns, labels, targets):
+    for target in targets:
+        _write(output / f"{target}bits_security.md",
+               _markdown(settings, records, log_ns, labels, target))
+        _write(output / f"{target}bits_security.json",
+               json.dumps(_export(settings, records, target), indent=2) + "\n")
+
+
+def render_tables(output: Union[str, Path]):
+    """Rewrite the Markdown and JSON tables of every target from output/results.json.
+
+    Nothing is estimated, so this only follows changes of the table layout.
+    """
+    output = Path(output)
+    stored = json.loads((output / "results.json").read_text())
+    targets = sorted({record["target"] for record in stored["cells"].values()})
+    _save_tables(output, stored["settings"], stored["cells"], (), (), targets)
+
+
 def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targets: Sequence[int],
               output: Union[str, Path], sigma="3.2", samples: Optional[int] = None,
               profile="matzov", lower: int = 15, upper: Optional[int] = None, window: int = 2,
               jobs: Optional[int] = None, cache=True, estimators: Optional[Callable] = None,
               progress: Optional[Callable] = None):
-    """Search every (logn, secret, target) cell and write results.json and Markdown tables.
+    """Search every (logn, secret, target) cell and write results.json, and Markdown and JSON tables.
 
     Completed cells are written immediately and reused when their backend
     revisions match. A cell's guess extrapolates the same secret and target at
@@ -236,9 +300,7 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
     def save():
         _write(results, json.dumps({"settings": settings, "cells": dict(sorted(records.items()))},
                                    indent=2) + "\n")
-        for target in targets:
-            _write(output / f"{target}bits_security.md",
-                   _markdown(settings, records, log_ns, labels, target))
+        _save_tables(output, settings, records, log_ns, labels, targets)
 
     def run(log_n, label, target, guess, prior, workers):
         key = _key(log_n, label, target)

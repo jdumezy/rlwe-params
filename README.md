@@ -44,6 +44,16 @@ Each cell is the largest `logq` such that every attack of the listed estimators 
 `err*` means an estimator failed on the cell, and `results.json` records its error.
 Each table lists its conventions and estimator revisions, and `results.json` records the binding attack and the cost of every attack at each cell's `logq`.
 
+Each table also comes as JSON, such as [`tables/128bits_security.json`](tables/128bits_security.json), for programs that derive presets or check parameters.
+Read it from a release tag, such as `https://raw.githubusercontent.com/jdumezy/rlwe-params/<tag>/tables/128bits_security.json`, and update the tag on purpose, since regenerated tables can change.
+Its `format` is incremented on any change that breaks readers.
+The top level gives the `target`, the `error` distribution, `samples` (`null` for unlimited), the smallest searched `logq` as `lower`, and the estimator `profile`.
+Each entry of `cells` has:
+
+- `log_n`, and `secret` with its `kind`: `ternary` or `binary` with `min` and `max`, `gaussian` with `sigma`, or `sparse_ternary` or `sparse_binary` with `h` and the counts of coefficients equal to 1 and -1 as `ones` and `minus_ones`.
+- `status` and `max_log_q`: `boundary` with the largest `logq`, `at_least_upper` with the upper search bound, also given as `upper`, or `below_lower` and `error` with `null`.
+- `security_bits` at `max_log_q` as a decimal string, `binding_attack`, the estimator `revisions`, and the `error` of failed cells.
+
 ## Usage
 
 Check a parameter set, with each attack's cost.
