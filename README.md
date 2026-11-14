@@ -41,6 +41,7 @@ docker run --rm -v "$PWD:/work" rlwe-params estimate --log-n 16 --log-q 1475 --h
 
 Each cell is the largest `logq` such that every attack of the listed estimators costs at least the target at `q = 2^logq`, and the next `logq` has an attack below it.
 `--` means even the smallest searched `logq` fails, and `>=U` means the upper search bound passes.
+`err*` means an estimator failed on the cell, and `results.json` records its error.
 Each table lists its conventions and estimator revisions, and `results.json` records the binding attack and the cost of every attack at each cell's `logq`.
 
 ## Usage

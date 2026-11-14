@@ -37,7 +37,7 @@ class Curve:
         logq = parameters.q.bit_length() - 1
         self.log.append((parameters.n, logq, name))
         if self.fail is not None and self.fail(parameters):
-            raise RuntimeError("attack failed")
+            raise EstimationError("attack failed")
         density = min(Decimal("3.5"), Decimal(parameters.secret.h) / 20) \
             if isinstance(parameters.secret, SparseTernary) else Decimal("3.5")
         return AttackEstimate(name, density * parameters.n / logq + (0 if name == "primal" else 5))
@@ -98,6 +98,7 @@ class TableTests(unittest.TestCase):
         self.assertIn(f"| 13 | {expected(13, 32, 128)} | {expected(13, 'ternary', 128)} |", table)
         self.assertIn("`curve` revision `r1`", table)
         self.assertIn("sigma = 3.2", table)
+        self.assertNotIn("err", table)
         self.assertTrue((self.output / "192bits_security.md").is_file())
 
     def test_rerun_reuses_cells_until_revisions_or_settings_change(self):
@@ -115,10 +116,14 @@ class TableTests(unittest.TestCase):
         fail = lambda parameters: parameters.n == 8192 and isinstance(parameters.secret, Ternary)
         records, failures, events = self.run_grid(fail=fail)
         self.assertEqual(set(failures), {"13:ternary:128", "13:ternary:192"})
-        self.assertNotIn("13:ternary:128", records)
-        self.assertIn("14:ternary:128", records)
-        self.assertIn(f"| 13 | {expected(13, 32, 128)} |  |",
-                      (self.output / "128bits_security.md").read_text())
+        self.assertEqual((records["13:ternary:128"]["status"], records["13:ternary:128"]["logq"]),
+                         ("error", None))
+        self.assertIn("attack failed", records["13:ternary:128"]["error"])
+        self.assertIn(("13:ternary:128", failures["13:ternary:128"]), events)
+        self.assertEqual(records["14:ternary:128"]["status"], "boundary")
+        table = (self.output / "128bits_security.md").read_text()
+        self.assertIn(f"| 13 | {expected(13, 32, 128)} | err\\* |", table)
+        self.assertIn("\\* An estimator failed on this cell", table)
         retried, failures, _ = self.run_grid()
         self.assertEqual((len(retried), failures), (12, {}))
 

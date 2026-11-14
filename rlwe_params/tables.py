@@ -125,6 +125,8 @@ def _cell(record):
         return "--"
     if record["status"] == "upper_bound":
         return f">={record['logq']}"
+    if record["status"] == "error":
+        return "err\\*"
     return str(record["logq"])
 
 
@@ -157,6 +159,9 @@ def _markdown(settings, records, log_ns, labels, target):
         f"`logq`, and the next `logq` has an attack below {target} bits. Integer `logq` from {settings['lower']} "
         f"to the upper bound were searched. `--`: the lower bound already fails. "
         f"`>=U`: the upper bound `U` meets the target. Empty: not computed.",
+        *(["", "\\* An estimator failed on this cell, so it has no result. "
+               "Its error is in `results.json`."]
+          if any(record["status"] == "error" for record in stored) else []),
         "",
         f"- Ring dimension `n = 2^logn`. Error: discrete Gaussian, `sigma = {settings['sigma']}`. "
         f"Samples: {'unlimited' if settings['samples'] is None else settings['samples']}.",
@@ -189,7 +194,9 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
     reference Parameters to estimators instead of the profile's backends.
     progress receives (cell key, logq, costs, full) for each evaluation, and
     (cell key, record) when a cell completes.
-    Return the records and the failures, mapping cell keys to exceptions.
+    A cell where an estimator fails is recorded with status "error", and retried
+    on the next run. Return the records and the failures, mapping cell keys to
+    exceptions.
     """
     log_ns = sorted(dict.fromkeys(log_ns))
     labels = list(dict.fromkeys(secrets))
@@ -241,7 +248,7 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
             active.extend(cell_estimators)
         revisions = {estimator.name: estimator.revision for estimator in cell_estimators}
         previous = records.get(key)
-        if previous is not None and previous["revisions"] == revisions:
+        if previous is not None and previous["status"] != "error" and previous["revisions"] == revisions:
             return previous
         counts = {"points": 0, "full": 0}
 
@@ -254,21 +261,29 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
         started = time.monotonic()
         if guess is not None:
             guess = max(lower, min(cell_upper, guess))
-        result = max_logq(n=n, secret=reference.secret, error=error, samples=samples,
-                          upper=cell_upper, target=target, lower=lower, guess=guess, window=window,
-                          estimators=cell_estimators, cache=cache, jobs=workers, progress=report,
-                          prior=prior)
-        costs = {} if result.logq is None else result.costs[result.logq]
-        return {
-            "log_n": log_n, "secret": label, "target": target, "logq": result.logq,
-            "status": result.status,
-            "security_bits": None if result.logq is None else str(result.security_bits),
-            "binding": min(costs, key=costs.get) if costs else None,
-            "costs": {attack: str(bits) for attack, bits in costs.items()},
-            "checked_interval": list(result.checked_interval), "upper": cell_upper,
-            "revisions": revisions, "evaluations": counts["points"],
-            "full_evaluations": counts["full"], "seconds": round(time.monotonic() - started, 1),
-        }
+        cell = {"log_n": log_n, "secret": label, "target": target}
+        try:
+            result = max_logq(n=n, secret=reference.secret, error=error, samples=samples,
+                              upper=cell_upper, target=target, lower=lower, guess=guess,
+                              window=window, estimators=cell_estimators, cache=cache, jobs=workers,
+                              progress=report, prior=prior)
+        except EstimationError as exc:
+            if stop.is_set():
+                raise
+            # Recorded so the table shows the failure. Reruns retry the cell.
+            cell.update(logq=None, status="error", error=str(exc), security_bits=None,
+                        binding=None, costs={}, checked_interval=[])
+        else:
+            costs = {} if result.logq is None else result.costs[result.logq]
+            cell.update(
+                logq=result.logq, status=result.status,
+                security_bits=None if result.logq is None else str(result.security_bits),
+                binding=min(costs, key=costs.get) if costs else None,
+                costs={attack: str(bits) for attack, bits in costs.items()},
+                checked_interval=list(result.checked_interval))
+        return {**cell, "upper": cell_upper, "revisions": revisions,
+                "evaluations": counts["points"], "full_evaluations": counts["full"],
+                "seconds": round(time.monotonic() - started, 1)}
 
     cells = [(log_n, label, target) for log_n in log_ns for target in targets for label in labels]
     pending, running, failures = list(cells), {}, {}
@@ -300,8 +315,10 @@ def run_table(*, log_ns: Sequence[int], secrets: Sequence[Union[int, str]], targ
                             progress(key, exc)
                         continue
                     save()
+                    if records[key]["status"] == "error":
+                        failures[key] = EstimationError(records[key]["error"])
                     if progress is not None:
-                        progress(key, records[key])
+                        progress(key, failures.get(key, records[key]))
         except BaseException:
             # Interrupted: refuse new attacks and abandon running ones, keeping saved cells.
             stop.set()
