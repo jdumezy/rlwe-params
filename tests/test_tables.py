@@ -10,7 +10,8 @@ import unittest
 from unittest.mock import patch
 
 from rlwe_params import (
-    AttackEstimate, DiscreteGaussian, EstimationError, SparseTernary, Ternary, Uniform, run_table,
+    AttackEstimate, DiscreteGaussian, EstimationError, SparseTernary, Ternary, Uniform,
+    render_tables, run_table,
 )
 from rlwe_params.cli import main
 from rlwe_params.tables import _prior, secret
@@ -101,6 +102,35 @@ class TableTests(unittest.TestCase):
         self.assertIn("sigma = 3.2", table)
         self.assertNotIn("err", table)
         self.assertTrue((self.output / "192bits_security.md").is_file())
+        export = self.export(128)
+        self.assertEqual({key: value for key, value in export.items() if key != "cells"}, {
+            "format": 1, "target": 128, "error": {"kind": "gaussian", "sigma": "3.2"},
+            "samples": None, "lower": 15,
+            "profile": {"name": "matzov", "cost_model": "MATZOV", "shape_model": "GSA",
+                        "backends": ["malb", "tabog"]},
+        })
+        # Dense secrets first, then by ring dimension within each secret.
+        self.assertEqual([(cell["secret"]["kind"], cell["log_n"]) for cell in export["cells"]],
+                         [(kind, log_n) for kind in ("ternary", "sparse_ternary") for log_n in (12, 13, 14)])
+        record = records["13:32:128"]
+        self.assertEqual(export["cells"][4], {
+            "log_n": 13, "secret": {"kind": "sparse_ternary", "h": 32, "ones": 16, "minus_ones": 16},
+            "status": "boundary", "max_log_q": expected(13, 32, 128), "upper": 512,
+            "security_bits": record["security_bits"], "binding_attack": "curve / primal",
+            "revisions": {"curve": "r1"},
+        })
+        self.assertEqual(export["cells"][0]["secret"], {"kind": "ternary", "min": -1, "max": 1})
+        self.assertEqual(self.export(192)["target"], 192)
+        # The tables are rendered from results.json alone.
+        rendered = {path.name: path.read_text() for path in self.output.glob("*bits_security.*")}
+        for path in self.output.glob("*bits_security.*"):
+            path.unlink()
+        render_tables(self.output)
+        self.assertEqual({path.name: path.read_text() for path in self.output.glob("*bits_security.*")},
+                         rendered)
+
+    def export(self, target):
+        return json.loads((self.output / f"{target}bits_security.json").read_text())
 
     def test_rerun_reuses_cells_until_revisions_or_settings_change(self):
         records, _, _ = self.run_grid()
@@ -125,6 +155,11 @@ class TableTests(unittest.TestCase):
         table = (self.output / "128bits_security.md").read_text()
         self.assertIn(f"| 12 | {expected(12, 'ternary', 128)} |\n| 13 | err\\* |", table)
         self.assertIn("\\* An estimator failed on this cell", table)
+        failed = self.export(128)["cells"][1]
+        self.assertEqual((failed["log_n"], failed["status"], failed["max_log_q"], failed["security_bits"]),
+                         (13, "error", None, None))
+        self.assertIn("attack failed", failed["error"])
+        self.assertNotIn("error", self.export(128)["cells"][0])
         retried, failures, _ = self.run_grid()
         self.assertEqual((len(retried), failures), (12, {}))
 
@@ -138,6 +173,8 @@ class TableTests(unittest.TestCase):
         table = (self.output / "128bits_security.md").read_text()
         self.assertIn("| 12 | >=50 |", table)
         self.assertIn("| 12 | -- |", table)
+        self.assertEqual([(cell["status"], cell["max_log_q"], cell["upper"]) for cell in self.export(128)["cells"]],
+                         [("at_least_upper", 50, 50), ("below_lower", None, 50)])
         self.assertEqual(secret(64), SparseTernary(32, 32))
         self.assertEqual(SparseTernary.weight(7), SparseTernary(3, 4))
         for label in (0, "dense", 1.5):
@@ -169,6 +206,13 @@ class TableTests(unittest.TestCase):
         self.assertLess(table.index("Ternary, binary"), table.index("Sparse ternary secrets"))
         self.assertLess(table.index("Sparse ternary secrets"), table.index("Sparse binary secrets"))
         self.assertIn(f"| logn \\ h | 64 |\n| -------- | --: |\n| 12 | {expected(12, 'binary-64', 128)} |", table)
+        secrets = [cell["secret"] for cell in self.export(128)["cells"] if cell["log_n"] == 12]
+        self.assertEqual(secrets, [
+            {"kind": "ternary", "min": -1, "max": 1}, {"kind": "binary", "min": 0, "max": 1},
+            {"kind": "gaussian", "sigma": "3.2"},
+            {"kind": "sparse_ternary", "h": 32, "ones": 16, "minus_ones": 16},
+            {"kind": "sparse_binary", "h": 64, "ones": 64, "minus_ones": 0},
+        ])
 
     def test_interruption_abandons_running_cells_and_starts_no_more(self):
         started, cancelled = Event(), Event()
